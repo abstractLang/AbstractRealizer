@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.12.35527.113
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Binutils", "Binutils", "{B775775F-7CB2-4042-9D0F-DDF2C38BB7C7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Abstract.Binutils.ELF", "Binutils\Abstract.Binutils.ELF\Abstract.Binutils.ELF.csproj", "{582D5F63-5D97-473C-9088-0B88AE27F781}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{582D5F63-5D97-473C-9088-0B88AE27F781}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{582D5F63-5D97-473C-9088-0B88AE27F781}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{582D5F63-5D97-473C-9088-0B88AE27F781}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{582D5F63-5D97-473C-9088-0B88AE27F781}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{582D5F63-5D97-473C-9088-0B88AE27F781} = {B775775F-7CB2-4042-9D0F-DDF2C38BB7C7}
+	EndGlobalSection
+EndGlobal
