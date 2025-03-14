@@ -1,4 +1,4 @@
-# Alpha instruction set
+# Omega instruction set
 #
 # Is the instruction set used to be received by the
 # realizer. It's a simple instruction set that convers
@@ -13,11 +13,15 @@
 nop
 invalid
 
+pop
+dup
+swap
+
 src.offset.global      <immu64>
 src.offset.rel         <immi16>
 src.offset.rel         <immi8>
 
-ld.const               nullptr
+ld.const               null
 ld.const.i1            true
 ld.const.i1            false
 ld.const.i8            <immi8>
@@ -27,24 +31,105 @@ ld.const.i64           <immi64>
 ld.const.i128          <immi128>
 ld.const.iptr          <immiptr>
 ld.const.i<immu8>      <immvar>
-ld.const.str           <immptr>
+ld.const.str           <ptr>
 
 ld.field               <field>
-ld.local.0
-ld.local.1
-ld.local.2
-ld.local.3
+ld.type                <struct>
+ld.funcref             <func>
+ld.enumref             <enum>
+ld.faultref            <fault>
+
+ld.arg.0
+ld.arg.1
+ld.arg.2
+ld.arg.3
 ld.local.<immu8>
 ld.local.<immu16>
-ld.type           <struct>
 
-new
-destroy
+ld.index.i1            <immuptr>
+ld.index.i8            <immuptr>
+ld.index.i16           <immuptr>
+ld.index.i32           <immuptr>
+ld.index.i64           <immuptr>
+ld.index.i128          <immuptr>
+ld.index.iptr          <immuptr>
+ld.index.obj           <type>             <immuptr>
 
-jmp               <immptr>
-jmp.if.zero       <immptr>
-jmp.if.nzero      <immptr>
-jmp.if.gr         <immptr>
-jmp.if.gre        <immptr>
-jmp.if.le         <immptr>
-jmp.if.let        <immptr>
+ld.length
+
+st.field               <field>
+
+st.local.<immu8>
+st.local.<immu16>
+
+st.index               <immuptr>
+
+call.static            <type>             <func>
+call.virt              <type>             <func>
+tail.call              <func>
+
+ret
+throw
+break
+
+conv i1
+conv i8
+conv i16
+conv i32
+conv i64
+conv i128
+conv iptr
+conv i<immu8>
+
+jmp                    <immptr>
+jmp.if.zero            <immptr>
+jmp.if.nzero           <immptr>
+jmp.if.eq              <immptr>
+jmp.if.neq             <immptr>
+jmp.if.gr              <immptr>
+jmp.if.gr.u            <immptr>
+jmp.if.gre             <immptr>
+jmp.if.gre.u           <immptr>
+jmp.if.ls              <immptr>
+jmp.if.ls.u            <immptr>
+jmp.if.lse             <immptr>
+jmp.if.lse.u           <immptr>
+
+check.zero
+check.nzero
+check.eq
+check.neq
+check.gr
+check.gr.u
+check.gre
+check.gre.u
+check.ls
+check.ls.u
+check.lse.u
+
+add
+sub
+mul
+mul.un
+div
+div.un
+rem
+rem.un
+neg
+
+and
+or
+not
+nand
+nor
+xor
+xnor
+
+shr
+shl
+
+
+flag.check_overflow on
+flag.check_overflow off
+flag.check_null on
+flag.check_null off

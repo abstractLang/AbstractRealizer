@@ -1,0 +1,81 @@
+# Alpha instruction set
+#
+# Is one of the options to be outputed by the realizer.
+# This option is optimized to be easily compatible with
+# real machine code, allowing an easy 1:1 translation to
+# native code.
+# This instruction set includes explicit registers mani-
+# pulation and no operations are made in the stack.
+# Operations are made aways in the register index 0.
+#__________________________________________________________
+
+nop
+invalud
+
+move.<reg128>        <reg128>
+move.<reg64>         <reg64>
+move.<reg32>         <reg32>
+move.<reg16>         <reg16>
+move.<reg8>          <reg8>
+
+move.zx.<reg128>     <reg64>
+move.zx.<reg128>     <reg32>
+move.zx.<reg128>     <reg16>
+move.zx.<reg128>     <reg8>
+move.zx.<reg64>      <reg32>
+move.zx.<reg64>      <reg16>
+move.zx.<reg64>      <reg8>
+move.zx.<reg32>      <reg16>
+move.zx.<reg32>      <reg8>
+move.zx.<reg16>      <reg8>
+move.zx.<reg8>       <reg8>
+
+load.<reg128>        <immi128>
+load.<reg64>         <immi64>
+load.<reg32>         <immi32>
+load.<reg16>         <immi16>
+load.<reg8>          <immi8>
+
+load.<reg128>        <ptr128>
+load.<reg64>         <ptr64>
+load.<reg32>         <ptr32>
+load.<reg16>         <ptr16>
+load.<reg8>          <ptr8>
+
+store.<reg128>       <immptr128>
+store.<reg64>        <immptr64>
+store.<reg32>        <immptr32>
+store.<reg16>        <immptr16>
+store.<reg8>         <immptr8>
+
+push                 <anyreg>
+pop                  <anyreg>
+push.flags
+pop.flags
+
+int                  0x<immuptr:X>
+
+call                 <func>
+tail.call            <func>
+ret
+
+add                  <anyreg>
+sub                  <anyreg>
+mul                  <anyreg>
+div                  <anyreg>
+mul.u                <anyreg>
+div.u                <anyreg>
+neg                  <anyreg>
+
+float.add            <reg>
+float.sub            <reg>
+float.mul            <reg>
+float.div            <reg>
+float.mul            <reg>
+float.div            <reg>
+float.neg            <reg>
+
+and                  <reg>
+or                   <reg>
+xor                  <reg>
+not                  <reg>
