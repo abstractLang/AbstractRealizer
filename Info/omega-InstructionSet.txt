@@ -1,0 +1,50 @@
+# Alpha instruction set
+#
+# Is the instruction set used to be received by the
+# realizer. It's a simple instruction set that convers
+# most of the needs of abstract and general languages.
+#
+# It is designed to store code information based in
+# operation order, also save information about the
+# source code to allow the realizer to return better
+# error messages, if needs.
+#__________________________________________________________
+
+nop
+invalid
+
+src.offset.global      <immu64>
+src.offset.rel         <immi16>
+src.offset.rel         <immi8>
+
+ld.const               nullptr
+ld.const.i1            true
+ld.const.i1            false
+ld.const.i8            <immi8>
+ld.const.i16           <immi16>
+ld.const.i32           <immi32>
+ld.const.i64           <immi64>
+ld.const.i128          <immi128>
+ld.const.iptr          <immiptr>
+ld.const.i<immu8>      <immvar>
+ld.const.str           <immptr>
+
+ld.field               <field>
+ld.local.0
+ld.local.1
+ld.local.2
+ld.local.3
+ld.local.<immu8>
+ld.local.<immu16>
+ld.type           <struct>
+
+new
+destroy
+
+jmp               <immptr>
+jmp.if.zero       <immptr>
+jmp.if.nzero      <immptr>
+jmp.if.gr         <immptr>
+jmp.if.gre        <immptr>
+jmp.if.le         <immptr>
+jmp.if.let        <immptr>
