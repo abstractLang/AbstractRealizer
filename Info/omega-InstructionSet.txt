@@ -46,14 +46,7 @@ ld.arg.3
 ld.local.<immu8>
 ld.local.<immu16>
 
-ld.index.i1            <immuptr>
-ld.index.i8            <immuptr>
-ld.index.i16           <immuptr>
-ld.index.i32           <immuptr>
-ld.index.i64           <immuptr>
-ld.index.i128          <immuptr>
-ld.index.iptr          <immuptr>
-ld.index.obj           <type>             <immuptr>
+ld.index               <immuptr>
 
 ld.length
 
@@ -87,13 +80,9 @@ jmp.if.nzero           <immptr>
 jmp.if.eq              <immptr>
 jmp.if.neq             <immptr>
 jmp.if.gr              <immptr>
-jmp.if.gr.u            <immptr>
 jmp.if.gre             <immptr>
-jmp.if.gre.u           <immptr>
 jmp.if.ls              <immptr>
-jmp.if.ls.u            <immptr>
 jmp.if.lse             <immptr>
-jmp.if.lse.u           <immptr>
 
 check.zero
 check.nzero
@@ -110,11 +99,8 @@ check.lse.u
 add
 sub
 mul
-mul.un
 div
-div.un
 rem
-rem.un
 neg
 
 and
