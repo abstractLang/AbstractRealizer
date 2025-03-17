@@ -18,8 +18,8 @@ dup
 swap
 
 src.offset.global      <immu64>
-src.offset.rel         <immi16>
 src.offset.rel         <immi8>
+src.offset.rel         <immi16>
 
 ld.const               null
 ld.const.i1            true
