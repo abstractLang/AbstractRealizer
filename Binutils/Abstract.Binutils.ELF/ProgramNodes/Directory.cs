@@ -15,12 +15,19 @@ public class Directory : Node
             _nodeChildren.Add(newdic);
             return newdic;
         }
-        else
+        else if (type == NodeTypes.Content)
         {
             var newcon = new Content(name);
             _nodeChildren.Add(newcon);
             return newcon;
         }
+        else if (type == NodeTypes.TextSection)
+        {
+            var newtxt = new TextSection(name);
+            _nodeChildren.Add(newtxt);
+            return newtxt;
+        }
+        else throw new NotImplementedException();
     }
 
     public override void Dispose()
