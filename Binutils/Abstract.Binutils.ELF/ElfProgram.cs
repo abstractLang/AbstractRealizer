@@ -1,4 +1,7 @@
-﻿namespace Abstract.Binutils.ELF;
+﻿using Abstract.Binutils.ELF.ProgramNodes;
+using Directory = Abstract.Binutils.ELF.ProgramNodes.Directory;
+
+namespace Abstract.Binutils.ELF;
 
 public class ElfProgram {
 

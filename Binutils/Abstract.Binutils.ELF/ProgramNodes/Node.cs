@@ -11,4 +11,6 @@ public abstract class Node : IDisposable
 
     public abstract void Dispose();
     ~Node() => Dispose();
+
+    public override string ToString() => $"{name} ({GetType().Name})";
 }
