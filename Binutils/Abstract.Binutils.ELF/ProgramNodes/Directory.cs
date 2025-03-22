@@ -1,3 +1,5 @@
+using System.Text;
+
 namespace Abstract.Binutils.ELF.ProgramNodes;
 
 public class Directory : Node
@@ -34,5 +36,21 @@ public class Directory : Node
     {
         GC.SuppressFinalize(this);
         foreach (var i in _nodeChildren) i.Dispose();
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        sb.AppendLine($"({name}");
+        foreach (var i in _nodeChildren)
+        {
+            var lines = i.ToString().Split(Environment.NewLine);
+            foreach (var j in lines) sb.AppendLine($"  {j}");
+        }
+        if (_nodeChildren.Count == 0) sb.Length -= Environment.NewLine.Length;
+        sb.Append(')');
+
+        return sb.ToString();
     }
 }
