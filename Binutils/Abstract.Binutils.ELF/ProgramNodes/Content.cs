@@ -1,11 +1,12 @@
 using System.Text;
+using Abstract.Binutils.ELF.ProgramNodes.Streams;
 
 namespace Abstract.Binutils.ELF.ProgramNodes;
 
 public class Content : Node
 {
-    private MemoryStream _content = new();
-    public Stream Stream => _content;
+    private ContentStream _content = new();
+    public ContentStream Stream => _content;
 
     internal Content(string name) : base(name) {}
 
