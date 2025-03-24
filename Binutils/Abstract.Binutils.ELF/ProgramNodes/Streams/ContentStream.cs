@@ -4,8 +4,7 @@ namespace Abstract.Binutils.ELF.ProgramNodes.Streams;
 
 public sealed class ContentStream : Stream
 {
-    private MemoryStream _memStream => new();
-    public MemoryStream stream => _memStream;
+    private readonly MemoryStream _memStream = new();
 
     public override bool CanRead => _memStream.CanRead;
     public override bool CanSeek =>_memStream.CanSeek;
@@ -20,12 +19,27 @@ public sealed class ContentStream : Stream
 
 
     public override void Write(byte[] buffer, int offset, int count) => _memStream.Write(buffer, offset, count);
-    public void Write(byte[] buffer) => _memStream.Write(buffer);
-    public void Write(Span<byte> buffer) => _memStream.Write(buffer);
 
-    public void WriteString_ASCII(string value) => _memStream.Write(Encoding.ASCII.GetBytes(value));
-    public void WriteString_UTF8(string value) => _memStream.Write(Encoding.UTF8.GetBytes(value));
+    public void WriteString_ASCII(string value) => Write(Encoding.ASCII.GetBytes(value));
+    public void WriteString_UTF8(string value) => Write(Encoding.UTF8.GetBytes(value));
 
 
     protected override void Dispose(bool disposing) => _memStream.Dispose();
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+
+        while (_memStream.Position < _memStream.Length)
+        {
+            var b = _memStream.ReadByte();
+            if (char.IsAsciiLetter((char)b))
+                sb.Append($"{(char)b} ");
+            else
+                sb.Append($"{b:X2} ");
+        }
+        if (_memStream.Length > 0) sb.Length -= 1;
+
+        return sb.ToString();
+    }
 }

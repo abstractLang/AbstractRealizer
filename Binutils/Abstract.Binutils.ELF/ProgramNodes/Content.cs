@@ -22,16 +22,7 @@ public class Content : Node
         var oldcursor = _content.Position;
         _content.Position = 0;
 
-        sb.Append($"({name} \""); 
-        while (_content.Position < _content.Length) {
-            var b = _content.ReadByte();
-            if (char.IsAsciiLetter((char)b))
-                sb.Append($"{(char)b} ");
-            else
-                sb.Append($"{b:X2} ");
-        }
-        sb.Length -= 1;
-        sb.Append("\")");
+        sb.Append($"({name} \"{_content}\")"); 
 
         _content.Position = oldcursor;
 
