@@ -29,16 +29,33 @@ public sealed class ContentStream : Stream
     public override string ToString()
     {
         var sb = new StringBuilder();
+        bool writingBinary = false;
 
         while (_memStream.Position < _memStream.Length)
         {
-            var b = _memStream.ReadByte();
-            if (char.IsAsciiLetter((char)b))
-                sb.Append($"{(char)b} ");
+            if (writingBinary)
+            {
+                var b = _memStream.ReadByte();
+                if (char.IsAsciiLetter((char)b))
+                    sb.Append($"{(char)b} ");
+                else
+                    sb.Append($"{b:X2} ");
+            }
             else
-                sb.Append($"{b:X2} ");
+            {
+                var b = _memStream.ReadByte();
+
+                if (!char.IsControl((char)b)) sb.Append($"{(char)b}");
+                else // Convert to binary
+                {
+                    var sbval = sb.ToString();
+                    sb.Clear();
+                    sb.Append(string.Join(" ", sbval.Split()));
+                    sb.Append(' ');
+                }
+            }
         }
-        if (_memStream.Length > 0) sb.Length -= 1;
+        if (writingBinary && _memStream.Length > 0) sb.Length -= 1;
 
         return sb.ToString();
     }

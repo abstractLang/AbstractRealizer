@@ -29,6 +29,12 @@ public class Directory : Node
             _nodeChildren.Add(newtxt);
             return newtxt;
         }
+        else if (type == NodeTypes.Pointer)
+        {
+            var newptr = new Pointer(name);
+            _nodeChildren.Add(newptr);
+            return newptr;
+        }
         else throw new NotImplementedException();
     }
 
@@ -49,6 +55,7 @@ public class Directory : Node
             foreach (var j in lines) sb.AppendLine($"  {j}");
         }
         if (_nodeChildren.Count == 0) sb.Length -= Environment.NewLine.Length;
+        sb.Length -= Environment.NewLine.Length;
         sb.Append(')');
 
         return sb.ToString();

@@ -7,8 +7,19 @@ namespace Abstract.Binutils.ELF;
 public class ElfProgram {
 
     private Directory _root = new("ROOT");
-    public Directory Root => _root;
+    private Directory _moduleLump;
+    private Directory _externLump;
 
+    public Directory Root => _root;
+    public Directory Module => _moduleLump;
+    public Directory Dependences => _externLump;
+
+
+    public ElfProgram()
+    {
+        _moduleLump = (Directory)_root.Branch("MODULE", NodeTypes.Directory);
+        _externLump = (Directory)_root.Branch("EXTERN", NodeTypes.Directory);
+    }
 
     public override string ToString()
     {
