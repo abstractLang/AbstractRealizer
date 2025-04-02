@@ -23,7 +23,7 @@ public class Pointer : Node
     {
         var sb = new StringBuilder();
 
-        sb.Append($"({name} (; TODO ;))"); 
+        sb.Append($"({name} (* -> {_pointsTo}))"); 
 
         return sb.ToString();
     }

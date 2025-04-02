@@ -13,4 +13,5 @@ public abstract class Node : IDisposable
     ~Node() => Dispose();
 
     public override string ToString() => $"({name})";
+    public virtual (string str, int c) ToStringCounting(int c) => ($"({name} (;{c};))", c + 1);
 }
