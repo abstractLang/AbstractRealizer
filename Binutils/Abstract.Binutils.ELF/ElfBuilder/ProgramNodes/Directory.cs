@@ -1,13 +1,14 @@
 using System.Text;
+using Abstract.Binutils.ELF.ElfBuilder.ProgramNodes;
 
-namespace Abstract.Binutils.ELF.ProgramNodes;
+namespace Abstract.Binutils.ELF.ElfBuilder.ProgramNodes;
 
 public class Directory : Node
 {
     private List<Node> _nodeChildren = [];
     public Node[] Children => [.. _nodeChildren];
 
-    internal Directory(string name) : base(name) {}
+    internal Directory(string name) : base(name) { }
 
     public Node Branch(string name, NodeTypes type)
     {

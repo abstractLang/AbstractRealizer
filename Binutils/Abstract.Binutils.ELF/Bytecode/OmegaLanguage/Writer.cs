@@ -1,4 +1,4 @@
-using ContentNode = Abstract.Binutils.ELF.ProgramNodes.Content;
+using ContentNode = Abstract.Binutils.ELF.ElfBuilder.ProgramNodes.Content;
 
 namespace Abstract.Binutils.ELF.Bytecode.OmegaLanguage;
 

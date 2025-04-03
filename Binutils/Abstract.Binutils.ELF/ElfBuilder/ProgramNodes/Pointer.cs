@@ -1,7 +1,7 @@
 using System.Text;
-using Abstract.Binutils.ELF.ProgramNodes.Streams;
+using Abstract.Binutils.ELF.ElfBuilder.ProgramNodes.Streams;
 
-namespace Abstract.Binutils.ELF.ProgramNodes;
+namespace Abstract.Binutils.ELF.ElfBuilder.ProgramNodes;
 
 public class Pointer : Node
 {
@@ -9,7 +9,7 @@ public class Pointer : Node
     public Node? PointsTo { get => _pointsTo; set => _pointsTo = value; }
 
 
-    internal Pointer(string name): base(name)
+    internal Pointer(string name) : base(name)
     {
 
     }
@@ -23,7 +23,7 @@ public class Pointer : Node
     {
         var sb = new StringBuilder();
 
-        sb.Append($"({name} (* -> {_pointsTo}))"); 
+        sb.Append($"({name} (* -> {_pointsTo?.name ?? "null"}))");
 
         return sb.ToString();
     }

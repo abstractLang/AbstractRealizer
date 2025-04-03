@@ -1,13 +1,13 @@
 ﻿using System.Text;
 
-namespace Abstract.Binutils.ELF.ProgramNodes.Streams;
+namespace Abstract.Binutils.ELF.ElfBuilder.ProgramNodes.Streams;
 
 public sealed class ContentStream : Stream
 {
-    private readonly MemoryStream _memStream = new();
+    internal readonly MemoryStream _memStream = new();
 
     public override bool CanRead => _memStream.CanRead;
-    public override bool CanSeek =>_memStream.CanSeek;
+    public override bool CanSeek => _memStream.CanSeek;
     public override bool CanWrite => _memStream.CanWrite;
     public override long Length => _memStream.Length;
     public override long Position { get => _memStream.Position; set => _memStream.Position = value; }
@@ -24,6 +24,11 @@ public sealed class ContentStream : Stream
     public void WriteString_UTF8(string value) => Write(Encoding.UTF8.GetBytes(value));
 
 
+    public ContentStream Truncate()
+    {
+        _memStream.Capacity = (int)_memStream.Length;
+        return this;
+    }
     protected override void Dispose(bool disposing) => _memStream.Dispose();
 
     public override string ToString()

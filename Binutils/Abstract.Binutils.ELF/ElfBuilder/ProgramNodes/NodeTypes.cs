@@ -1,4 +1,4 @@
-namespace Abstract.Binutils.ELF.ProgramNodes;
+namespace Abstract.Binutils.ELF.ElfBuilder.ProgramNodes;
 
 public enum NodeTypes
 {

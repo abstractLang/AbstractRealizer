@@ -1,7 +1,7 @@
 using System.Text;
-using Abstract.Binutils.ELF.ProgramNodes.Streams;
+using Abstract.Binutils.ELF.ElfBuilder.ProgramNodes.Streams;
 
-namespace Abstract.Binutils.ELF.ProgramNodes;
+namespace Abstract.Binutils.ELF.ElfBuilder.ProgramNodes;
 
 public class Content : Node
 {
