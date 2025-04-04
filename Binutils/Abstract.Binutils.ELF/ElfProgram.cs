@@ -53,7 +53,6 @@ public class ELFProgram
 
         return sb.ToString();
     }
-
     private void WriteDirectory(List<ELFDirectory> dl, List<ElfLump> ll, ELFDirectory dir, int level, StringBuilder sb)
     {
         if (level > 1024) throw new StackOverflowException();
@@ -75,13 +74,9 @@ public class ELFProgram
         else
         {
             if (dir.length == uint.MaxValue)
-            {
                 sb.Append($" * -> ${dir.pointer}");
-            }
             else
-            {
                 sb.Append($" \"{ll[(int)dir.pointer]}\"");
-            }
         }
 
         sb.Append(')');
