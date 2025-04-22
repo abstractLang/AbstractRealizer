@@ -76,7 +76,7 @@ public class ElfProgramBuilder
 
                 else if (i.dir is TextSection t)
                 {
-                    throw new NotImplementedException("Text sections are not implemented yet");
+                    // TODO
                 }
             }
         }

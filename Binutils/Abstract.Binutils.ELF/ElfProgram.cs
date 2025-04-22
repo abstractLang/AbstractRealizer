@@ -63,16 +63,14 @@ public class ELFProgram
         sb.Append($"({_directoryTypes[(int)dir.identifier]}");
         sb.Append($" (;{dl.IndexOf(dir):X};)");
 
-        if (!dir.isLump)
-        {
-            foreach (var i in _dirList[(int)dir.pointer..(int)(dir.pointer + dir.length)])
+        if (!dir.isLump) {
+            foreach (var i in _dirList[(int)dir.pointer .. (int)(dir.pointer + dir.length)])
             {
                 sb.AppendLine();
                 WriteDirectory(dl, ll, i, level + 1, sb);
             }
         }
-        else
-        {
+        else {
             if (dir.length == uint.MaxValue)
                 sb.Append($" * -> ${dir.pointer}");
             else
