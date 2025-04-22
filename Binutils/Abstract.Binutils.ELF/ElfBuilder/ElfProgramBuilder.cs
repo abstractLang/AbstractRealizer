@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using Abstract.Binutils.ELF.ElfBuilder.ProgramNodes;
+using Abstract.Binutils.ELF.ElfBuilder.ProgramNodes.Streams;
 using Directory = Abstract.Binutils.ELF.ElfBuilder.ProgramNodes.Directory;
 
 namespace Abstract.Binutils.ELF.ElfBuilder;
@@ -70,13 +71,15 @@ public class ElfProgramBuilder
                 else if (i.dir is Content c)
                 {
                     var stream = c.Stream;
-                    var lump_ptr = newProgram.AppendLump(new ElfLump(c.Stream));
+                    var lump_ptr = newProgram.AppendLump(new ElfLump(stream));
                     newProgram.AppendDirectory(new ELFDirectory(type, lump_ptr, (uint)stream.Length, true));
                 }
 
                 else if (i.dir is TextSection t)
                 {
-                    // TODO
+                    var stream = new ContentStream();
+                    var lump_ptr = newProgram.AppendLump(new ElfLump(stream));
+                    newProgram.AppendDirectory(new ELFDirectory(type, lump_ptr, (uint)stream.Length, true));
                 }
             }
         }

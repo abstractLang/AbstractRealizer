@@ -13,7 +13,7 @@ public class ELFProgram
     private uint _dataLength = 0;
     public ElfLump[] Lumps => [.. _lumpList];
 
-    private List<string> _directoryTypes = new();
+    private List<string> _directoryTypes = [];
     private MemoryStream _identifiers = new();
 
     internal uint AppendDirectory(ELFDirectory dir)
@@ -49,11 +49,11 @@ public class ELFProgram
         var sb = new StringBuilder();
 
         var root = _dirList[0];
-        WriteDirectory(_dirList, _lumpList, root, 0, sb);
+        WriteDirectory(root, 0, sb);
 
         return sb.ToString();
     }
-    private void WriteDirectory(List<ELFDirectory> dl, List<ElfLump> ll, ELFDirectory dir, int level, StringBuilder sb)
+    private void WriteDirectory(ELFDirectory dir, int level, StringBuilder sb)
     {
         if (level > 1024) throw new StackOverflowException();
 
@@ -61,20 +61,20 @@ public class ELFProgram
 
         sb.Append(tabs);
         sb.Append($"({_directoryTypes[(int)dir.identifier]}");
-        sb.Append($" (;{dl.IndexOf(dir):X};)");
+        sb.Append($" (;{_dirList.IndexOf(dir):X};)");
 
         if (!dir.isLump) {
             foreach (var i in _dirList[(int)dir.pointer .. (int)(dir.pointer + dir.length)])
             {
                 sb.AppendLine();
-                WriteDirectory(dl, ll, i, level + 1, sb);
+                WriteDirectory(i, level + 1, sb);
             }
         }
         else {
             if (dir.length == uint.MaxValue)
                 sb.Append($" * -> ${dir.pointer}");
             else
-                sb.Append($" \"{ll[(int)dir.pointer]}\"");
+                sb.Append($" \"{_lumpList[(int)dir.pointer]}\"");
         }
 
         sb.Append(')');
