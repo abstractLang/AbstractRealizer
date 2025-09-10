@@ -42,7 +42,7 @@ public struct Inst__Swap : IOmegaInstruction
 
 public struct Inst__Call(FunctionBuilder r) : IOmegaInstruction
 {
-    public override string ToString() => $"call {r.Name}";
+    public override string ToString() => $"call {r.ToReadableReference()}";
 }
 
 public struct Inst__Call_virt() : IOmegaInstruction

@@ -5,7 +5,7 @@ using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class FunctionBuilder(string name): ProgramMemberBuilder(name)
+public class FunctionBuilder(NamespaceBuilder parent, string name): ProgramMemberBuilder(parent, name)
 {
     private List<(string, TypeReference)> parameters = [];
     private List<TypeReference> locals = [];
@@ -46,6 +46,20 @@ public class FunctionBuilder(string name): ProgramMemberBuilder(name)
         if (BytecodeBuilder != null) sb.Append(BytecodeBuilder.ToString().TabAllLines().TabAllLines());
         
         sb.Length -= Environment.NewLine.Length;
+        sb.Append(')');
+        
+        return sb.ToString();
+    }
+
+    public string ToReadableReference()
+    {
+        var sb = new StringBuilder();
+
+        sb.Append('"');
+        sb.AppendJoin('.', GlobalIdentifier);
+        sb.Append('"');
+        sb.Append('(');
+        sb.AppendJoin(", ", parameters.Select(e => e.Item2.ToString()));
         sb.Append(')');
         
         return sb.ToString();

@@ -1,6 +1,17 @@
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class ProgramMemberBuilder(string name)
+public abstract class ProgramMemberBuilder
 {
-    public readonly string Name = name;
+    public readonly NamespaceBuilder? Parent;
+    public readonly string Name;
+
+    public string[] GlobalIdentifier => Parent == null
+        ? [Name]
+        : [..Parent.GlobalIdentifier.Where(e=>!string.IsNullOrEmpty(e)), Name];
+    
+    internal ProgramMemberBuilder(NamespaceBuilder parent, string name)
+    {
+        Parent = parent;
+        Name = name;
+    }
 }
