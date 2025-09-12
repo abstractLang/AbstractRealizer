@@ -252,6 +252,10 @@ public struct Inst__Trunc(u8 len) : IOmegaInstruction
     public override string ToString() => $"trunc {len}";
 }
 
+public struct Inst__Sigcast(bool signed) : IOmegaInstruction
+{
+    public override string ToString() => $"sigcast." + (signed ? 's' : 'u');
+}
 public struct Inst__Bitcast(u8 len) : IOmegaInstruction
 {
     public override string ToString() => $"bitcast {len}";

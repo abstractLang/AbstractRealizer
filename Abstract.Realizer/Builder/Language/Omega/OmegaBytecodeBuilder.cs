@@ -91,8 +91,9 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter StField() => AddAndReturn(new Inst__St_Field());
         public InstructionWriter StIndex() => AddAndReturn(new Inst__St_Index());
         
-        public InstructionWriter Extend() => AddAndReturn(new Inst__Extend());
-        public InstructionWriter Trunc() => AddAndReturn(new Inst__Trunc());
+        public InstructionWriter Extend(byte size) => AddAndReturn(new Inst__Extend(size));
+        public InstructionWriter Trunc(byte size) => AddAndReturn(new Inst__Trunc(size));
+        public InstructionWriter Sigcast(bool signess) => AddAndReturn(new Inst__Sigcast(signess));
         public InstructionWriter Bitcast() => AddAndReturn(new Inst__Bitcast());
         
         public InstructionWriter MemCopy() => AddAndReturn(new Inst__Mem_Copy());
