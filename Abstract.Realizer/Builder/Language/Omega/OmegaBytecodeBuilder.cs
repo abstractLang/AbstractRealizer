@@ -77,7 +77,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdConstNull() => AddAndReturn(new Inst__Ld_Const_Null());
         
         public InstructionWriter LdNewSlice() => AddAndReturn(new Inst__Ld_New_Slice());
-        public InstructionWriter LdNewObject() => AddAndReturn(new Inst__Ld_New_Object());
+        public InstructionWriter LdNewObject(TypeBuilder r) => AddAndReturn(new Inst__Ld_New_Object(r));
         
         public InstructionWriter LdLocal(short index) => AddAndReturn(new Inst__Ld_Local(index));
         public InstructionWriter LdLocalRef(short index) => AddAndReturn(new Inst__Ld_Local_Ref(index));

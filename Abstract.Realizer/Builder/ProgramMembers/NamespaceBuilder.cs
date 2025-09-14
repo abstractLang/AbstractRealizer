@@ -1,11 +1,14 @@
 using System.Text;
+using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class NamespaceBuilder(NamespaceBuilder parent, string name): ProgramMemberBuilder(parent, name)
+public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name): ProgramMemberBuilder(parent, name),
+    INamespaceOrStructureBuilder
 {
     
     protected List<NamespaceBuilder> namespaces = [];
+    protected List<FieldBuilder> fields = [];
     protected List<FunctionBuilder> functions = [];
     protected List<StructureBuilder> structures = [];
     protected List<TypeDefinitionBuilder> typedefs = [];
@@ -24,19 +27,24 @@ public class NamespaceBuilder(NamespaceBuilder parent, string name): ProgramMemb
         functions.Add(newFunction);
         return newFunction;
     }
-
     public StructureBuilder AddStructure(string st)
     {
         var newStructure = new StructureBuilder(this, st);
         structures.Add(newStructure);
         return newStructure;
     }
-
     public TypeDefinitionBuilder AddTypedef(string td)
     {
         var newTypedef = new TypeDefinitionBuilder(this, td);
         typedefs.Add(newTypedef);
         return newTypedef;
+    }
+
+    public FieldBuilder AddStaticField(string fn)
+    {
+        var newField = new FieldBuilder(this, fn);
+        fields.Add(newField);
+        return newField;
     }
 
 
@@ -46,6 +54,7 @@ public class NamespaceBuilder(NamespaceBuilder parent, string name): ProgramMemb
 
         sb.AppendLine($"(namespace \"{name}\"");
         foreach (var i in namespaces) sb.AppendLine(i.ToString().TabAllLines());
+        foreach (var i in fields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in structures) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in typedefs) sb.AppendLine(i.ToString().TabAllLines());

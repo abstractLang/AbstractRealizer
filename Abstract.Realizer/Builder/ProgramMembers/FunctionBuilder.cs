@@ -5,7 +5,7 @@ using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class FunctionBuilder(NamespaceBuilder parent, string name): ProgramMemberBuilder(parent, name)
+public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): ProgramMemberBuilder(parent, name)
 {
     private List<(string, TypeReference)> parameters = [];
     private List<TypeReference> locals = [];
