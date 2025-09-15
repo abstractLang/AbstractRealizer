@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Reflection.Emit;
 using Abstract.Realizer.Builder.ProgramMembers;
+using FieldBuilder = Abstract.Realizer.Builder.ProgramMembers.FieldBuilder;
 using TypeBuilder = Abstract.Realizer.Builder.ProgramMembers.TypeBuilder;
 
 namespace Abstract.Realizer.Builder.Language.Omega.Instructions;
@@ -179,7 +180,7 @@ public struct Inst__Ld_New_Slice : IOmegaInstruction
 
 public struct Inst__Ld_New_Object(TypeBuilder r) : IOmegaInstruction
 {
-    public override string ToString() => $"ld.const.obj {r.Name}";
+    public override string ToString() => $"ld.new.obj {r.Name}";
 }
 
 public struct Inst__Ld_Local(i16 index) : IOmegaInstruction
@@ -226,15 +227,15 @@ public struct Inst__Ld_Index : IOmegaInstruction
 public struct Inst__St_Local(i16 index) : IOmegaInstruction
 {
     public override string ToString() => index < -3
-            ? $"st.arg {-index - 1}"
+            ? $"st.arg ${-index - 1}"
             : index < 0 ?
                 $"st.arg.{-index - 1}"
-                : $"st.local {index}";
+                : $"st.local ${index}";
 }
 
-public struct Inst__St_Field : IOmegaInstruction
+public struct Inst__St_Field(FieldBuilder f) : IOmegaInstruction
 {
-    public override string ToString() => $"ld.field";
+    public override string ToString() => $"st.field {f.ToReadableReference()}";
 }
 
 public struct Inst__St_Index : IOmegaInstruction

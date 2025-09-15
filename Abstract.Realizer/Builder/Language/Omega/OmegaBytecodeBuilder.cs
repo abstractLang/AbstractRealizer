@@ -88,7 +88,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdIndex() => AddAndReturn(new Inst__Ld_Index());
         
         public InstructionWriter StLocal(short index) => AddAndReturn(new Inst__St_Local(index));
-        public InstructionWriter StField() => AddAndReturn(new Inst__St_Field());
+        public InstructionWriter StField(FieldBuilder r) => AddAndReturn(new Inst__St_Field(r));
         public InstructionWriter StIndex() => AddAndReturn(new Inst__St_Index());
         
         public InstructionWriter Extend(byte size) => AddAndReturn(new Inst__Extend(size));
