@@ -9,7 +9,7 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
     
     protected List<NamespaceBuilder> namespaces = [];
     protected List<FieldBuilder> fields = [];
-    protected List<FunctionBuilder> functions = [];
+    protected List<BaseFunctionBuilder> functions = [];
     protected List<StructureBuilder> structures = [];
     protected List<TypeDefinitionBuilder> typedefs = [];
 
@@ -24,6 +24,12 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
     public FunctionBuilder AddFunction(string fn)
     {
         var newFunction = new FunctionBuilder(this, fn);
+        functions.Add(newFunction);
+        return newFunction;
+    }
+    public ImportedFunctionBuilder AddExternImportedFunction(string fn)
+    {
+        var newFunction = new ImportedFunctionBuilder(this, fn);
         functions.Add(newFunction);
         return newFunction;
     }

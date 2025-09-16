@@ -5,25 +5,11 @@ using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): ProgramMemberBuilder(parent, name)
+public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): BaseFunctionBuilder(parent, name)
 {
-    private List<(string, TypeReference)> parameters = [];
-    private List<TypeReference> locals = [];
-
-    public BytecodeBuilder? BytecodeBuilder { get; private set;  } = null!;
-
-    public int AddParameter(string name, TypeReference typeReference)
-    {
-        parameters.Add((name, typeReference));
-        return parameters.Count - 1;
-    }
-    public int AddLocal(TypeReference typeReference)
-    {
-        locals.Add(typeReference);
-        return locals.Count - 1;
-    }
-
-
+    public BytecodeBuilder? BytecodeBuilder { get; private set;  }
+  
+    
     public OmegaBytecodeBuilder GetOrCreateOmegaBuilder()
     {
         if (BytecodeBuilder is not null and not OmegaBytecodeBuilder)
@@ -32,7 +18,7 @@ public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): 
         BytecodeBuilder ??= new OmegaBytecodeBuilder();
         return (BytecodeBuilder as OmegaBytecodeBuilder)!;
     }
-    
+   
     
     public override string ToString()
     {
@@ -50,18 +36,5 @@ public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): 
         
         return sb.ToString();
     }
-
-    public string ToReadableReference()
-    {
-        var sb = new StringBuilder();
-
-        sb.Append('"');
-        sb.AppendJoin('.', GlobalIdentifier);
-        sb.Append('"');
-        sb.Append('(');
-        sb.AppendJoin(", ", parameters.Select(e => e.Item2.ToString()));
-        sb.Append(')');
-        
-        return sb.ToString();
-    }
+    
 }

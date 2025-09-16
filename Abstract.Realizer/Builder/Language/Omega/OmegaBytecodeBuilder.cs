@@ -41,7 +41,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter Pop() => AddAndReturn(new Inst__Pop());
         public InstructionWriter Dup() => AddAndReturn(new Inst__Dup());
         public InstructionWriter Swap() => AddAndReturn(new Inst__Swap());
-        public InstructionWriter Call(FunctionBuilder r) => AddAndReturn(new Inst__Call(r));
+        public InstructionWriter Call(BaseFunctionBuilder r) => AddAndReturn(new Inst__Call(r));
         public InstructionWriter CallVirt() => AddAndReturn(new Inst__Call_virt());
         
         public InstructionWriter Add() => AddAndReturn(new Inst__Add());
@@ -81,7 +81,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         
         public InstructionWriter LdLocal(short index) => AddAndReturn(new Inst__Ld_Local(index));
         public InstructionWriter LdLocalRef(short index) => AddAndReturn(new Inst__Ld_Local_Ref(index));
-        public InstructionWriter LdField() => AddAndReturn(new Inst__Ld_Field());
+        public InstructionWriter LdField(FieldBuilder r) => AddAndReturn(new Inst__Ld_Field(r));
         public InstructionWriter LdFieldRef() => AddAndReturn(new Inst__Ld_Field_Ref());
         public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new Inst__Ld_Func_Ref(funcref));
         public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new Inst__Ld_Type_Ref(typeref));

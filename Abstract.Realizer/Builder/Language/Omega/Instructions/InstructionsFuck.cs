@@ -41,7 +41,7 @@ public struct Inst__Swap : IOmegaInstruction
     public override string ToString() => "swap";
 }
 
-public struct Inst__Call(FunctionBuilder r) : IOmegaInstruction
+public struct Inst__Call(BaseFunctionBuilder r) : IOmegaInstruction
 {
     public override string ToString() => $"call {r.ToReadableReference()}";
 }
@@ -199,9 +199,9 @@ public struct Inst__Ld_Local_Ref(i16 index) : IOmegaInstruction
             : $"ld.local.ref ${index}";
 }
 
-public struct Inst__Ld_Field() : IOmegaInstruction
+public struct Inst__Ld_Field(FieldBuilder r) : IOmegaInstruction
 {
-    public override string ToString() => $"ld.field";
+    public override string ToString() => $"ld.field {r.ToReadableReference()}";
 }
 
 public struct Inst__Ld_Field_Ref() : IOmegaInstruction
