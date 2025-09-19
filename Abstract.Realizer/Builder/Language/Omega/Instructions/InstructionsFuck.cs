@@ -43,6 +43,7 @@ public struct Inst__Swap : IOmegaInstruction
 
 public struct Inst__Call(BaseFunctionBuilder r) : IOmegaInstruction
 {
+    public BaseFunctionBuilder function = r;
     public override string ToString() => $"call {r.ToReadableReference()}";
 }
 
@@ -63,6 +64,7 @@ public struct Inst__Sub : IOmegaInstruction
 
 public struct Inst__Mul(u1 signed) : IOmegaInstruction
 {
+    public bool signed = signed;
     public override string ToString() => "mul." + (signed ? 's' : 'u');
 }
 
@@ -130,41 +132,50 @@ public struct Inst__End: IOmegaInstruction { }
 
 public struct Inst__Ld_Const_i1(u1 value) : IOmegaInstruction
 {
+    public u1 value = value;
     public override string ToString() => $"ld.const.i1 {value}";
 }
 
 public struct Inst__Ld_Const_i8(u8 value) : IOmegaInstruction
 {
+    public u8 value = value;
     public override string ToString() => $"ld.const.i8 0x{value:x} ;;{value}";
 }
 
 public struct Inst__Ld_Const_i16(u16 value) : IOmegaInstruction
 {
+    public u16 value = value;
     public override string ToString() => $"ld.const.i16 0x{value:x} ;;{value}";
 }
 
 public struct Inst__Ld_Const_i32(u32 value) : IOmegaInstruction
 {
+    public u32 value = value;
     public override string ToString() => $"ld.const.i32 0x{value:x} ;;{value}";
 }
 
 public struct Inst__Ld_Const_i64(u64 value) : IOmegaInstruction
 {
+    public u64 value = value;
     public override string ToString() => $"ld.const.i64 0x{value:x} ;;{value}";
 }
 
 public struct Inst__Ld_Const_i128(u128 value) : IOmegaInstruction
 {
+    public u128 value = value;
     public override string ToString() => $"ld.const.i128 0x{value:x} ;;{value}";
 }
 
 public struct Inst__Ld_Const_iptr(u64 value) : IOmegaInstruction
 {
+    public u64 value = value;
     public override string ToString() => $"ld.const.iptr 0x{value:x} ;;{value}";
 }
 
 public struct Inst__Ld_Const_i(u8 len, BigInteger value) : IOmegaInstruction
 {
+    public u8 len = len;
+    public BigInteger value = value;
     public override string ToString() => $"ld.const.i{len} 0x{value:x} ;;{value}";
 }
 
@@ -180,11 +191,13 @@ public struct Inst__Ld_New_Slice : IOmegaInstruction
 
 public struct Inst__Ld_New_Object(TypeBuilder r) : IOmegaInstruction
 {
+    public TypeBuilder type = r;
     public override string ToString() => $"ld.new.obj {r.Name}";
 }
 
 public struct Inst__Ld_Local(i16 index) : IOmegaInstruction
 {
+    public i16 local = index;
     public override string ToString() => index < -3
             ? $"ld.arg ${-index - 1}"
             : index < 0
@@ -201,12 +214,24 @@ public struct Inst__Ld_Local_Ref(i16 index) : IOmegaInstruction
 
 public struct Inst__Ld_Field(FieldBuilder r) : IOmegaInstruction
 {
-    public override string ToString() => $"ld.field {r.ToReadableReference()}";
+    public FieldBuilder field = r;
+    public override string ToString() => $"ld.field {field.ToReadableReference()}";
 }
 
 public struct Inst__Ld_Field_Ref() : IOmegaInstruction
 {
     public override string ToString() => $"ld.field.ref";
+}
+public struct Inst__Access_Field(FieldBuilder r) : IOmegaInstruction
+{
+    public FieldBuilder field = r;
+    public override string ToString() => $"access.field {field.ToReadableReference()}";
+}
+
+public struct Inst__Access_Field_Ref(FieldBuilder r) : IOmegaInstruction
+{
+    public FieldBuilder field = r;
+    public override string ToString() => $"access.field.ref";
 }
 
 public struct Inst__Ld_Func_Ref(FunctionBuilder r) : IOmegaInstruction
@@ -226,6 +251,7 @@ public struct Inst__Ld_Index : IOmegaInstruction
 
 public struct Inst__St_Local(i16 index) : IOmegaInstruction
 {
+    public i16 index = index;
     public override string ToString() => index < -3
             ? $"st.arg ${-index - 1}"
             : index < 0 ?
@@ -235,6 +261,7 @@ public struct Inst__St_Local(i16 index) : IOmegaInstruction
 
 public struct Inst__St_Field(FieldBuilder f) : IOmegaInstruction
 {
+    public FieldBuilder field = f;
     public override string ToString() => $"st.field {f.ToReadableReference()}";
 }
 
@@ -245,16 +272,19 @@ public struct Inst__St_Index : IOmegaInstruction
 
 public struct Inst__Extend(u8 len) : IOmegaInstruction
 {
+    public u8 len = len;
     public override string ToString() => $"extend {len}";
 }
 
 public struct Inst__Trunc(u8 len) : IOmegaInstruction
 {
+    public u8 len = len;
     public override string ToString() => $"trunc {len}";
 }
 
 public struct Inst__Sigcast(bool signed) : IOmegaInstruction
 {
+    public bool segned = signed;
     public override string ToString() => $"sigcast." + (signed ? 's' : 'u');
 }
 public struct Inst__Bitcast(u8 len) : IOmegaInstruction

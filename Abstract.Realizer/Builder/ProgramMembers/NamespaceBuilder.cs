@@ -69,4 +69,6 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
         
         return sb.ToString();
     }
+
+    public override string ToReadableReference() => '"' + string.Join('.', GlobalIdentifier) + '"';
 }

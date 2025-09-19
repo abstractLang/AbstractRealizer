@@ -14,4 +14,6 @@ public abstract class ProgramMemberBuilder
         Parent = parent;
         Name = name;
     }
+
+    public abstract string ToReadableReference();
 }

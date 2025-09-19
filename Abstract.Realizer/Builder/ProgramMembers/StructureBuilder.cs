@@ -35,4 +35,6 @@ public class StructureBuilder(NamespaceBuilder parent, string name): TypeBuilder
         
         return sb.ToString();
     }
+    
+    public override string ToReadableReference() => '"' + string.Join('.', GlobalIdentifier) + '"';
 }

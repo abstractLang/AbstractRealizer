@@ -7,7 +7,9 @@ public abstract class BaseFunctionBuilder(INamespaceOrStructureBuilder parent, s
 {
     protected List<(string, TypeReference)> parameters = [];
     protected List<TypeReference> locals = [];
-
+    
+    public (string, TypeReference)[] Parameters => [.. parameters];
+    
     public int AddParameter(string name, TypeReference typeReference)
     {
         parameters.Add((name, typeReference));
@@ -19,7 +21,7 @@ public abstract class BaseFunctionBuilder(INamespaceOrStructureBuilder parent, s
         return locals.Count - 1;
     }
     
-    public string ToReadableReference()
+    public override string ToReadableReference()
     {
         var sb = new StringBuilder();
 

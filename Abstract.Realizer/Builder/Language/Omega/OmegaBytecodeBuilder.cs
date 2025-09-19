@@ -15,32 +15,118 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
     public override string ToString()
     {
         var sb = new StringBuilder();
+        var q = new Queue<IOmegaInstruction>(_instructions);
+        while (q.Count > 0) WriteInstruction(sb, q);
 
-        foreach (var i in _instructions)
-        {
-            if (i is IOmegaFlag) sb.Append(i);
-            else sb.AppendLine(i.ToString());
-        }
+        //sb.AppendLine();
+        //foreach (var i in _instructions) sb.AppendLine(";; " + i);
         
         return sb.ToString();
     }
 
-    public sealed class InstructionWriter
+    private void WriteInstruction(StringBuilder sb, Queue<IOmegaInstruction> instQueue)
     {
-        private OmegaBytecodeBuilder parentBuilder;
-        internal InstructionWriter(OmegaBytecodeBuilder builder) => parentBuilder = builder;
+        var a = instQueue.Peek();
+        switch (a)
+        {
+            case Inst__Nop:
+            {
+                instQueue.Dequeue();
+                sb.AppendLine("nop");
+            } break;
+
+            case Inst__St_Local @stlocal:
+            {
+                instQueue.Dequeue();
+                if (stlocal.index < 0) sb.Append($"(arg ${(-stlocal.index) - 1}) = ");
+                else sb.Append($"(local {stlocal.index}) = ");
+                sb.AppendLine(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
+            } break;
+            
+            case Inst__St_Field @sffld:
+            {
+                instQueue.Dequeue();
+                sb.Append($"(field {sffld.field.ToReadableReference()}) = ");
+                sb.AppendLine(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
+            } break;
+
+            default:
+            {
+                sb.AppendLine(WriteInstructionValue(instQueue).TrimStart('\t'));
+            } break;
+        }
+    }
+    private string WriteInstructionValue(Queue<IOmegaInstruction> instQueue)
+    {
+        if (instQueue.Count == 0) return "<eof>";
+        var sb = new StringBuilder();
+        
+        var a = instQueue.Dequeue();
+        switch (a)
+        {
+            case Inst__Not: sb.Append($"(not\n\t{WriteInstructionValue(instQueue)})"); break;
+            case Inst__Add: sb.Append($"(add" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case Inst__Mul @m: sb.Append($"(mul." + (m.signed ? 's' : 'u') +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            
+            case Inst__Sigcast @s: sb.Append("(sigcast." + (s.segned ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
+            case Inst__Trunc @t: sb.Append($"(trunc {t.len} {WriteInstructionValue(instQueue)})"); break;
+            case Inst__Extend @e: sb.Append($"(extend {e.len} {WriteInstructionValue(instQueue)})"); break;
+            
+            case Inst__Ld_Const_i @ldconsti: sb.Append($"(const {ldconsti.len} 0x{ldconsti.value:x})"); break;
+            case Inst__Ld_Const_i1 @ldc: sb.Append("(const 1 " + (ldc.value ? "true" : "false" + ")")); break;
+            case Inst__Ld_Const_i8 @ldc: sb.Append($"(const 8 0x{ldc.value:x})"); break;
+            case Inst__Ld_Const_i16 @ldc: sb.Append($"(const 16 0x{ldc.value:x})"); break;
+            case Inst__Ld_Const_i32 @ldc: sb.Append($"(const 32 0x{ldc.value:x})"); break;
+            case Inst__Ld_Const_i64 @ldc: sb.Append($"(const 64 0x{ldc.value:x})"); break;
+            case Inst__Ld_Const_i128 @ldc: sb.Append($"(const 128 0x{ldc.value:x})"); break;
+
+            case Inst__Ld_Local @ldl:
+                if (ldl.local < 0) sb.Append($"(arg {(-ldl.local)-1})");
+                else sb.Append($"(local {ldl.local})");
+                break;
+            case Inst__Ld_Field @ldf: sb.Append($"(field {ldf.field.ToReadableReference()})"); break;
+            case Inst__Access_Field @acf: sb.Append($"(field {acf.field.ToReadableReference()})"); break;
+            
+            case Inst__Call @call:
+            {
+                sb.Append($"(call {call.function.ToReadableReference()} (");
+                foreach (var i in call.function.Parameters)
+                    sb.Append("\n" + WriteInstructionValue(instQueue).TabAllLines());
+                sb.Append("))");
+            } break;
+
+            case Inst__Ld_New_Object @newobj:
+                sb.Append($"newobj({newobj.type.ToReadableReference()})");
+                break;
+            
+            default: throw new NotImplementedException();
+        }
+
+        if (instQueue.Count > 0
+            && instQueue.Peek() is Inst__Access_Field)
+            sb.Append($"->{WriteInstructionValue(instQueue)}");
+
+        return sb.ToString();
+    }
+    
+
+    public struct InstructionWriter
+    {
+        private OmegaBytecodeBuilder _parentBuilder;
+        internal InstructionWriter(OmegaBytecodeBuilder builder) => _parentBuilder = builder;
 
         private InstructionWriter AddAndReturn(IOmegaInstruction value)
         {
-            parentBuilder._instructions.Add(value);
+            _parentBuilder._instructions.Add(value);
             return this;
         }
 
         public InstructionWriter Nop() => AddAndReturn(new Inst__Nop());
         public InstructionWriter Invalid() => AddAndReturn(new Inst__Invalid());
-        public InstructionWriter Pop() => AddAndReturn(new Inst__Pop());
-        public InstructionWriter Dup() => AddAndReturn(new Inst__Dup());
-        public InstructionWriter Swap() => AddAndReturn(new Inst__Swap());
         public InstructionWriter Call(BaseFunctionBuilder r) => AddAndReturn(new Inst__Call(r));
         public InstructionWriter CallVirt() => AddAndReturn(new Inst__Call_virt());
         
@@ -83,6 +169,8 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdLocalRef(short index) => AddAndReturn(new Inst__Ld_Local_Ref(index));
         public InstructionWriter LdField(FieldBuilder r) => AddAndReturn(new Inst__Ld_Field(r));
         public InstructionWriter LdFieldRef() => AddAndReturn(new Inst__Ld_Field_Ref());
+        public InstructionWriter AccessField(FieldBuilder r) => AddAndReturn(new Inst__Access_Field(r));
+        public InstructionWriter AccessFieldRef() => AddAndReturn(new Inst__Access_Field_Ref());
         public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new Inst__Ld_Func_Ref(funcref));
         public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new Inst__Ld_Type_Ref(typeref));
         public InstructionWriter LdIndex() => AddAndReturn(new Inst__Ld_Index());

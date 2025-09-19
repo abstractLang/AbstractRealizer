@@ -7,6 +7,6 @@ public class FieldBuilder(INamespaceOrStructureBuilder parent, string name): Pro
     public TypeReference? Type = null;
     public override string ToString() => $"(field \"{Name}\" {Type?.ToString() ?? "<nil>"})";
 
-    public string ToReadableReference() => $"\"{string.Join('.', GlobalIdentifier)}\"";
+    public override string ToReadableReference() => $"\"{string.Join('.', GlobalIdentifier)}\"";
     
 }
