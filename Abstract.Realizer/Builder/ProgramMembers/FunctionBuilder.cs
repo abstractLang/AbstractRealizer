@@ -24,7 +24,7 @@ public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): 
     {
         var sb = new StringBuilder();
 
-        sb.Append($"(function \"{Name}\"");
+        sb.Append($"(func \"{Name}\"");
         foreach (var (name, type) in parameters) sb.Append($" (param \"{name}\" {type})");
         sb.AppendLine();
         for (var i = 0; i < locals.Count; i++) sb.AppendLine($"\t(local ${i:d2} {locals[i]})");
