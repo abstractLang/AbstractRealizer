@@ -1,6 +1,5 @@
 using System.Numerics;
 using System.Text;
-using Abstract.Realizer.Builder.Language.Omega.Instructions;
 using Abstract.Realizer.Builder.ProgramMembers;
 using TypeBuilder = Abstract.Realizer.Builder.ProgramMembers.TypeBuilder;
 
@@ -29,18 +28,18 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         var a = instQueue.Peek();
         switch (a)
         {
-            case Inst__Nop:
+            case InstNop:
                 instQueue.Dequeue();
                 sb.Append("nop");
                 break;
 
-            case Inst__Ret @r:
+            case InstRet @r:
                 instQueue.Dequeue();
                 sb.Append("ret");
                 if (r.value) sb.Append(" " + WriteInstructionValue(instQueue).TabAllLines()[1..]);
                 break;
             
-            case Inst__St_Local @stlocal:
+            case InstStLocal @stlocal:
             {
                 instQueue.Dequeue();
                 if (stlocal.index < 0) sb.Append($"(arg ${(-stlocal.index) - 1}) = ");
@@ -48,14 +47,14 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
-            case Inst__St_Field @stfld:
+            case InstStStaticField @stfld:
             {
                 instQueue.Dequeue();
                 sb.Append($"(field {stfld.field.ToReadableReference()}) = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
-            case Inst__St_Instance_Field @stfld:
+            case InstStField @stfld:
             {
                 instQueue.Dequeue();
                 sb.Append($"(field {stfld.field.ToReadableReference()}) = ");
@@ -76,34 +75,34 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         var a = instQueue.Dequeue();
         switch (a)
         {
-            case Inst__Not: sb.Append($"(not\n\t{WriteInstructionValue(instQueue)})"); break;
-            case Inst__Add: sb.Append($"(add" +
+            case InstNot: sb.Append($"(not\n\t{WriteInstructionValue(instQueue)})"); break;
+            case InstAdd: sb.Append($"(add" +
                                       $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                       $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case Inst__Mul @m: sb.Append($"(mul." + (m.signed ? 's' : 'u') +
+            case InstMul @m: sb.Append($"(mul." + (m.signed ? 's' : 'u') +
                                       $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                       $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
             
-            case Inst__Sigcast @s: sb.Append("(sigcast." + (s.segned ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
-            case Inst__Trunc @t: sb.Append($"(trunc {t.len} {WriteInstructionValue(instQueue)})"); break;
-            case Inst__Extend @e: sb.Append($"(extend {e.len} {WriteInstructionValue(instQueue)})"); break;
+            case InstSigcast @s: sb.Append("(sigcast." + (s.segned ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
+            case InstTrunc @t: sb.Append($"(trunc {t.len} {WriteInstructionValue(instQueue)})"); break;
+            case InstExtend @e: sb.Append($"(extend {e.len} {WriteInstructionValue(instQueue)})"); break;
             
-            case Inst__Ld_Const_i @ldconsti: sb.Append($"(const {ldconsti.len} 0x{ldconsti.value:x})"); break;
-            case Inst__Ld_Const_i1 @ldc: sb.Append("(const 1 " + (ldc.value ? "true" : "false" + ")")); break;
-            case Inst__Ld_Const_i8 @ldc: sb.Append($"(const 8 0x{ldc.value:x})"); break;
-            case Inst__Ld_Const_i16 @ldc: sb.Append($"(const 16 0x{ldc.value:x})"); break;
-            case Inst__Ld_Const_i32 @ldc: sb.Append($"(const 32 0x{ldc.value:x})"); break;
-            case Inst__Ld_Const_i64 @ldc: sb.Append($"(const 64 0x{ldc.value:x})"); break;
-            case Inst__Ld_Const_i128 @ldc: sb.Append($"(const 128 0x{ldc.value:x})"); break;
+            case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.len} 0x{ldconsti.value:x})"); break;
+            case InstLdConstI1 @ldc: sb.Append("(const 1 " + (ldc.value ? "true" : "false" + ")")); break;
+            case InstLdConstI8 @ldc: sb.Append($"(const 8 0x{ldc.value:x})"); break;
+            case InstLdConstI16 @ldc: sb.Append($"(const 16 0x{ldc.value:x})"); break;
+            case InstLdConstI32 @ldc: sb.Append($"(const 32 0x{ldc.value:x})"); break;
+            case InstLdConstI64 @ldc: sb.Append($"(const 64 0x{ldc.value:x})"); break;
+            case InstLdConsti128 @ldc: sb.Append($"(const 128 0x{ldc.value:x})"); break;
 
-            case Inst__Ld_Local @ldl:
+            case InstLdLocal @ldl:
                 if (ldl.local < 0) sb.Append($"(arg {(-ldl.local)-1})");
                 else sb.Append($"(local {ldl.local})");
                 break;
-            case Inst__Ld_Field @ldf: sb.Append($"(field {ldf.field.ToReadableReference()})"); break;
-            case Inst__Ld_Instance_Field @acf: sb.Append($"(field {acf.field.ToReadableReference()})"); break;
+            case InstLdStaticField @ldf: sb.Append($"(field {ldf.field.ToReadableReference()})"); break;
+            case InstLdField @acf: sb.Append($"(field {acf.field.ToReadableReference()})"); break;
             
-            case Inst__Call @call:
+            case InstCall @call:
             {
                 sb.Append($"(call {call.function.ToReadableReference()} (");
                 foreach (var i in call.function.Parameters)
@@ -111,7 +110,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 sb.Append("))");
             } break;
 
-            case Inst__Ld_New_Object @newobj:
+            case InstLdNewObject @newobj:
                 sb.Append($"newobj({newobj.type.ToReadableReference()})");
                 break;
             
@@ -119,8 +118,8 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         }
 
         if (instQueue.Count > 0 && instQueue.Peek() 
-            is Inst__Ld_Instance_Field
-            or Inst__St_Instance_Field)
+            is InstLdField
+            or InstStField)
         {
             sb.Append("->");
             WriteInstruction(sb, instQueue, true);
@@ -141,72 +140,72 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             return this;
         }
 
-        public InstructionWriter Nop() => AddAndReturn(new Inst__Nop());
-        public InstructionWriter Invalid() => AddAndReturn(new Inst__Invalid());
-        public InstructionWriter Call(BaseFunctionBuilder r) => AddAndReturn(new Inst__Call(r));
-        public InstructionWriter CallVirt() => AddAndReturn(new Inst__Call_virt());
-        public InstructionWriter Ret(bool value) => AddAndReturn(new Inst__Ret(value));
+        public InstructionWriter Nop() => AddAndReturn(new InstNop());
+        public InstructionWriter Invalid() => AddAndReturn(new InstInvalid());
+        public InstructionWriter Call(BaseFunctionBuilder r) => AddAndReturn(new InstCall(r));
+        public InstructionWriter CallVirt() => AddAndReturn(new InstCallvirt());
+        public InstructionWriter Ret(bool value) => AddAndReturn(new InstRet(value));
         
-        public InstructionWriter Add() => AddAndReturn(new Inst__Add());
-        public InstructionWriter Sub() => AddAndReturn(new Inst__Sub());
-        public InstructionWriter Mul(bool signed) => AddAndReturn(new Inst__Mul(signed));
-        public InstructionWriter Div(bool signed) => AddAndReturn(new Inst__Div(signed));
-        public InstructionWriter Rem(bool signed) => AddAndReturn(new Inst__Rem(signed));
-        public InstructionWriter Neg() => AddAndReturn(new Inst__Neg());
-        public InstructionWriter Not() => AddAndReturn(new Inst__Not());
-        public InstructionWriter And() => AddAndReturn(new Inst__And());
-        public InstructionWriter Or() => AddAndReturn(new Inst__Or());
-        public InstructionWriter Xor() => AddAndReturn(new Inst__Xor());
-        public InstructionWriter Shr() => AddAndReturn(new Inst__Shr());
-        public InstructionWriter Shl() => AddAndReturn(new Inst__Shl());
-        public InstructionWriter Ror() => AddAndReturn(new Inst__Ror());
-        public InstructionWriter Rol() => AddAndReturn(new Inst__Rol());
+        public InstructionWriter Add() => AddAndReturn(new InstAdd());
+        public InstructionWriter Sub() => AddAndReturn(new InstSub());
+        public InstructionWriter Mul(bool signed) => AddAndReturn(new InstMul(signed));
+        public InstructionWriter Div(bool signed) => AddAndReturn(new InstDiv(signed));
+        public InstructionWriter Rem(bool signed) => AddAndReturn(new InstRem(signed));
+        public InstructionWriter Neg() => AddAndReturn(new InstNeg());
+        public InstructionWriter Not() => AddAndReturn(new InstNot());
+        public InstructionWriter And() => AddAndReturn(new InstAnd());
+        public InstructionWriter Or() => AddAndReturn(new InstOr());
+        public InstructionWriter Xor() => AddAndReturn(new InstXor());
+        public InstructionWriter Shr() => AddAndReturn(new InstShr());
+        public InstructionWriter Shl() => AddAndReturn(new InstShl());
+        public InstructionWriter Ror() => AddAndReturn(new InstRor());
+        public InstructionWriter Rol() => AddAndReturn(new InstRol());
         
-        public InstructionWriter Block(string label) => AddAndReturn(new Inst__Block(label));
-        public InstructionWriter Loop(string label) => AddAndReturn(new Inst__Loop(label));
-        public InstructionWriter If() => AddAndReturn(new Inst__If());
-        public InstructionWriter Else() => AddAndReturn(new Inst__Else());
-        public InstructionWriter Switch() => AddAndReturn(new Inst__Switch());
-        public InstructionWriter End() => AddAndReturn(new Inst__End());
+        public InstructionWriter Block(string label) => AddAndReturn(new InstBlock(label));
+        public InstructionWriter Loop(string label) => AddAndReturn(new InstLoop(label));
+        public InstructionWriter If() => AddAndReturn(new InstIf());
+        public InstructionWriter Else() => AddAndReturn(new InstElse());
+        public InstructionWriter Switch() => AddAndReturn(new InstSwitch());
+        public InstructionWriter End() => AddAndReturn(new InstEnd());
         
-        public InstructionWriter LdConstI1(bool value) => AddAndReturn(new Inst__Ld_Const_i1(value));
-        public InstructionWriter LdConstI8(byte value) => AddAndReturn(new Inst__Ld_Const_i8(value));
-        public InstructionWriter LdConstI16(ushort value) => AddAndReturn(new Inst__Ld_Const_i16(value));
-        public InstructionWriter LdConstI32(uint value) => AddAndReturn(new Inst__Ld_Const_i32(value));
-        public InstructionWriter LdConstI64(ulong value) => AddAndReturn(new Inst__Ld_Const_i64(value));
-        public InstructionWriter LdConstI128(UInt128 value) => AddAndReturn(new Inst__Ld_Const_i128(value));
-        public InstructionWriter LdConstIptr(ulong value) => AddAndReturn(new Inst__Ld_Const_iptr(value));
-        public InstructionWriter LdConstI(byte size, BigInteger value) => AddAndReturn(new Inst__Ld_Const_i(size, value));
-        public InstructionWriter LdConstNull() => AddAndReturn(new Inst__Ld_Const_Null());
+        public InstructionWriter LdConstI1(bool value) => AddAndReturn(new InstLdConstI1(value));
+        public InstructionWriter LdConstI8(byte value) => AddAndReturn(new InstLdConstI8(value));
+        public InstructionWriter LdConstI16(ushort value) => AddAndReturn(new InstLdConstI16(value));
+        public InstructionWriter LdConstI32(uint value) => AddAndReturn(new InstLdConstI32(value));
+        public InstructionWriter LdConstI64(ulong value) => AddAndReturn(new InstLdConstI64(value));
+        public InstructionWriter LdConstI128(UInt128 value) => AddAndReturn(new InstLdConsti128(value));
+        public InstructionWriter LdConstIptr(ulong value) => AddAndReturn(new InstLdConstIptr(value));
+        public InstructionWriter LdConstI(byte size, BigInteger value) => AddAndReturn(new InstLdConstI(size, value));
+        public InstructionWriter LdConstNull() => AddAndReturn(new InstLdConstNull());
         
-        public InstructionWriter LdNewSlice() => AddAndReturn(new Inst__Ld_New_Slice());
-        public InstructionWriter LdNewObject(TypeBuilder r) => AddAndReturn(new Inst__Ld_New_Object(r));
+        public InstructionWriter LdNewSlice() => AddAndReturn(new InstLdNewSlice());
+        public InstructionWriter LdNewObject(TypeBuilder r) => AddAndReturn(new InstLdNewObject(r));
         
-        public InstructionWriter LdLocal(short index) => AddAndReturn(new Inst__Ld_Local(index));
-        public InstructionWriter LdLocalRef(short index) => AddAndReturn(new Inst__Ld_Local_Ref(index));
-        public InstructionWriter LdField(FieldBuilder r) => AddAndReturn(new Inst__Ld_Field(r));
-        public InstructionWriter LdFieldRef() => AddAndReturn(new Inst__Ld_Field_Ref());
-        public InstructionWriter LdInstanceField(FieldBuilder r) => AddAndReturn(new Inst__Ld_Instance_Field(r));
-        public InstructionWriter LdInstanceFieldRef() => AddAndReturn(new Inst__Ld_Instance_Field_Ref());
-        public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new Inst__Ld_Func_Ref(funcref));
-        public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new Inst__Ld_Type_Ref(typeref));
-        public InstructionWriter LdIndex() => AddAndReturn(new Inst__Ld_Index());
+        public InstructionWriter LdLocal(short index) => AddAndReturn(new InstLdLocal(index));
+        public InstructionWriter LdLocalRef(short index) => AddAndReturn(new InstLdLocalRef(index));
+        public InstructionWriter LdStaticField(FieldBuilder r) => AddAndReturn(new InstLdStaticField(r));
+        public InstructionWriter LdStaticFieldRef() => AddAndReturn(new InstLdStaticFieldRef());
+        public InstructionWriter LdField(FieldBuilder r) => AddAndReturn(new InstLdField(r));
+        public InstructionWriter LdFieldRef() => AddAndReturn(new InstLdFieldRef());
+        public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new InstLdFuncRef(funcref));
+        public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new InstLdTypeRef(typeref));
+        public InstructionWriter LdIndex() => AddAndReturn(new InstLdIndex());
         
-        public InstructionWriter StLocal(short index) => AddAndReturn(new Inst__St_Local(index));
-        public InstructionWriter StField(FieldBuilder r) => AddAndReturn(new Inst__St_Field(r));
-        public InstructionWriter StInstanceField(FieldBuilder r) => AddAndReturn(new Inst__St_Instance_Field(r));
-        public InstructionWriter StIndex() => AddAndReturn(new Inst__St_Index());
+        public InstructionWriter StLocal(short index) => AddAndReturn(new InstStLocal(index));
+        public InstructionWriter StStaticField(FieldBuilder r) => AddAndReturn(new InstStStaticField(r));
+        public InstructionWriter StField(FieldBuilder r) => AddAndReturn(new InstStField(r));
+        public InstructionWriter StIndex() => AddAndReturn(new InstStIndex());
         
-        public InstructionWriter Extend(byte size) => AddAndReturn(new Inst__Extend(size));
-        public InstructionWriter Trunc(byte size) => AddAndReturn(new Inst__Trunc(size));
-        public InstructionWriter Sigcast(bool signess) => AddAndReturn(new Inst__Sigcast(signess));
-        public InstructionWriter Bitcast() => AddAndReturn(new Inst__Bitcast());
+        public InstructionWriter Extend(byte size) => AddAndReturn(new InstExtend(size));
+        public InstructionWriter Trunc(byte size) => AddAndReturn(new InstTrunc(size));
+        public InstructionWriter Sigcast(bool signess) => AddAndReturn(new InstSigcast(signess));
+        public InstructionWriter Bitcast() => AddAndReturn(new InstBitcast());
         
-        public InstructionWriter MemCopy() => AddAndReturn(new Inst__Mem_Copy());
-        public InstructionWriter MemFill() => AddAndReturn(new Inst__Mem_Fill());
-        public InstructionWriter MemEq() => AddAndReturn(new Inst__Mem_Eq());
+        public InstructionWriter MemCopy() => AddAndReturn(new InstMemCopy());
+        public InstructionWriter MemFill() => AddAndReturn(new InstMemFill());
+        public InstructionWriter MemEq() => AddAndReturn(new InstMemEq());
         
-        public InstructionWriter AllowOvf() => AddAndReturn(new Flag_Allow_Ovf());
-        public InstructionWriter AllowNil() => AddAndReturn(new Flag_Allow_Nil());
+        public InstructionWriter AllowOvf() => AddAndReturn(new FlagAllowOvf());
+        public InstructionWriter AllowNil() => AddAndReturn(new FlagAllowNil());
     }
 }
