@@ -3,12 +3,17 @@ using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public abstract class BaseFunctionBuilder(INamespaceOrStructureBuilder parent, string name): ProgramMemberBuilder(parent, name)
+public abstract class BaseFunctionBuilder: ProgramMemberBuilder
 {
     protected List<(string, TypeReference)> parameters = [];
     protected List<TypeReference> locals = [];
     
     public (string, TypeReference)[] Parameters => [.. parameters];
+    
+    
+    internal BaseFunctionBuilder(INamespaceOrStructureBuilder parent, string name) : base(parent, name) { }
+    internal BaseFunctionBuilder(INamespaceOrStructureBuilder parent, BaseFunctionBuilder tocopy) : this(parent, tocopy.Name) {}
+    
     
     public int AddParameter(string name, TypeReference typeReference)
     {

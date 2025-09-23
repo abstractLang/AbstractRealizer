@@ -2,15 +2,17 @@ using System.Text;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class ModuleBuilder(string name): NamespaceBuilder(null!, name)
+public class ModuleBuilder: NamespaceBuilder
 {
-    
 
+    internal ModuleBuilder(string name) : base(null!, name) { }
+    internal ModuleBuilder(ModuleBuilder tocopy) : this(tocopy.Name) { }
+    
     public override string ToString()
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"(module \"{name}\"");
+        sb.AppendLine($"(module \"{Name}\"");
         foreach (var i in namespaces) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in structures) sb.AppendLine(i.ToString().TabAllLines());

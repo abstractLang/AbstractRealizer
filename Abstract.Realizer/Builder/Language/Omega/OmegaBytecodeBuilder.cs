@@ -12,6 +12,12 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
     public InstructionWriter Writer => new(this);
     
     
+    public override object Clone()
+    {
+        var clone = new OmegaBytecodeBuilder();
+        clone._instructions = _instructions.ToList();
+        return clone;
+    }
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -24,6 +30,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         return sb.ToString();
     }
 
+    
     private void WriteInstruction(StringBuilder sb, Queue<IOmegaInstruction> instQueue, bool recursive = false)
     {
         var a = instQueue.Peek();

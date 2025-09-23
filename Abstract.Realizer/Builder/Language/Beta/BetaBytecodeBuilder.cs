@@ -9,6 +9,12 @@ public class BetaBytecodeBuilder : BytecodeBuilder
     public InstructionWriter Writer => new(this);
 
 
+    public override object Clone()
+    {
+        var clone = new BetaBytecodeBuilder();
+        _instructions = _instructions.ToList();
+        return clone;
+    }
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -18,7 +24,6 @@ public class BetaBytecodeBuilder : BytecodeBuilder
         return sb.ToString();
     }
     
-
     public struct InstructionWriter
     {
         private BetaBytecodeBuilder _parentBuilder;

@@ -2,8 +2,7 @@ using System.Text;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name): ProgramMemberBuilder(parent, name),
-    INamespaceOrStructureBuilder
+public class NamespaceBuilder: ProgramMemberBuilder, INamespaceOrStructureBuilder
 {
     
     protected List<NamespaceBuilder> namespaces = [];
@@ -13,13 +12,30 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
     protected List<TypeDefinitionBuilder> typedefs = [];
 
 
+    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, string name) : base(null!, name) { }
+    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, NamespaceBuilder tocopy) : this(parent, tocopy.Name)
+    {
+        foreach (var i in tocopy.namespaces) namespaces.Add(new NamespaceBuilder(this, i));
+        foreach (var i in tocopy.structures) structures.Add(new StructureBuilder(this, i)); 
+        foreach (var i in tocopy.typedefs) typedefs.Add(new(this, i));
+        
+        foreach (var i in tocopy.functions)
+        {
+            switch (i)
+            {
+                case FunctionBuilder f: functions.Add(new FunctionBuilder(this, f)); break;
+                case ImportedFunctionBuilder f: functions.Add(new ImportedFunctionBuilder(this, f)); break;
+            }
+        } 
+    }
+    
+    
     public NamespaceBuilder AddNamespace(string ns)
     {
         var newNamespace = new NamespaceBuilder(this, ns);
         namespaces.Add(newNamespace);
         return newNamespace;
     }
-
     public FunctionBuilder AddFunction(string fn)
     {
         var newFunction = new FunctionBuilder(this, fn);
@@ -44,20 +60,19 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
         typedefs.Add(newTypedef);
         return newTypedef;
     }
-
     public FieldBuilder AddStaticField(string fn)
     {
         var newField = new FieldBuilder(this, fn);
         fields.Add(newField);
         return newField;
     }
-
-
+    
+    
     public override string ToString()
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"(namespace \"{name}\"");
+        sb.AppendLine($"(namespace \"{Name}\"");
         foreach (var i in namespaces) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in fields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());
@@ -68,7 +83,7 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
         
         return sb.ToString();
     }
-
+    
     public override string ToReadableReference() => '"' + string.Join('.', GlobalIdentifier) + '"';
     
 }

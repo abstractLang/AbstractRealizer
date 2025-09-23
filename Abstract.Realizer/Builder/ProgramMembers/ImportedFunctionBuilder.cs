@@ -2,11 +2,18 @@ using System.Text;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-public class ImportedFunctionBuilder(INamespaceOrStructureBuilder parent, string name): BaseFunctionBuilder(parent, name)
+public class ImportedFunctionBuilder: BaseFunctionBuilder
 {
     public string? Symbol { get; set; }
    
 
+    internal ImportedFunctionBuilder(INamespaceOrStructureBuilder parent, string name) : base(parent, name) { }
+    internal ImportedFunctionBuilder(INamespaceOrStructureBuilder parent, ImportedFunctionBuilder tocopy) : this(parent, tocopy.Name)
+    {
+        Symbol = tocopy.Symbol;
+    }
+    
+    
     public override string ToString()
     {
         var sb = new StringBuilder();
