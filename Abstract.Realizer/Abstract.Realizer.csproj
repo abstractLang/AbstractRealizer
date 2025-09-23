@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <Folder Include="Builder\Language\Alpha\" />
+      <Folder Include="Core\Configuration\" />
+    </ItemGroup>
+
 </Project>

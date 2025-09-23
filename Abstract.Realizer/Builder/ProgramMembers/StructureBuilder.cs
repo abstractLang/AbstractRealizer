@@ -1,5 +1,4 @@
 using System.Text;
-using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
@@ -22,6 +21,7 @@ public class StructureBuilder(NamespaceBuilder parent, string name): TypeBuilder
         functions.Add(newFunction);
         return newFunction;
     }
+    
     
     public override string ToString()
     {

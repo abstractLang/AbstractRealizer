@@ -1,7 +1,6 @@
 using System.Text;
 using Abstract.Realizer.Builder.Language;
 using Abstract.Realizer.Builder.Language.Omega;
-using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
@@ -18,8 +17,7 @@ public class FunctionBuilder(INamespaceOrStructureBuilder parent, string name): 
         BytecodeBuilder ??= new OmegaBytecodeBuilder();
         return (BytecodeBuilder as OmegaBytecodeBuilder)!;
     }
-   
-    
+
     public override string ToString()
     {
         var sb = new StringBuilder();

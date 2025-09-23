@@ -1,5 +1,4 @@
 using System.Text;
-using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
@@ -71,4 +70,5 @@ public class NamespaceBuilder(INamespaceOrStructureBuilder parent, string name):
     }
 
     public override string ToReadableReference() => '"' + string.Join('.', GlobalIdentifier) + '"';
+    
 }

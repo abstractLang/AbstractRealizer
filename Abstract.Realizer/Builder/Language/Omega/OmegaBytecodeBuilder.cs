@@ -8,6 +8,7 @@ namespace Abstract.Realizer.Builder.Language.Omega;
 public class OmegaBytecodeBuilder: BytecodeBuilder
 {
     private List<IOmegaInstruction> _instructions = [];
+    public List<IOmegaInstruction> InstructionsList => _instructions;
     public InstructionWriter Writer => new(this);
     
     
