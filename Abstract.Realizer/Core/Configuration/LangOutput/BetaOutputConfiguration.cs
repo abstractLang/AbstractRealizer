@@ -2,6 +2,8 @@ namespace Abstract.Realizer.Core.Configuration.LangOutput;
 
 public class BetaOutputConfiguration : ILanguageOutputConfiguration
 {
+    public bool BakeGenerics { get; set; }
+    public byte MemoryUnit { get; set; }
 
     public BetaExtendableInstructionSet EnabledOpcodes { get; set; } = BetaExtendableInstructionSet.All;
     public BetaExtendableScopes EnabledScopes { get; set; } = BetaExtendableScopes.All;

@@ -58,14 +58,14 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             case InstStStaticField @stfld:
             {
                 instQueue.Dequeue();
-                sb.Append($"(field {stfld.field.ToReadableReference()}) = ");
+                sb.Append($"(field {stfld.StaticField.ToReadableReference()}) = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
             case InstStField @stfld:
             {
                 instQueue.Dequeue();
-                sb.Append($"(field {stfld.field.ToReadableReference()}) = ");
+                sb.Append($"(field {stfld.StaticField.ToReadableReference()}) = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
@@ -97,18 +97,14 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             
             case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.len} 0x{ldconsti.value:x})"); break;
             case InstLdConstI1 @ldc: sb.Append("(const 1 " + (ldc.value ? "true" : "false" + ")")); break;
-            case InstLdConstI8 @ldc: sb.Append($"(const 8 0x{ldc.value:x})"); break;
-            case InstLdConstI16 @ldc: sb.Append($"(const 16 0x{ldc.value:x})"); break;
-            case InstLdConstI32 @ldc: sb.Append($"(const 32 0x{ldc.value:x})"); break;
-            case InstLdConstI64 @ldc: sb.Append($"(const 64 0x{ldc.value:x})"); break;
-            case InstLdConsti128 @ldc: sb.Append($"(const 128 0x{ldc.value:x})"); break;
+            case InstLdConstIptr @ldc: sb.Append($"(const ptr 0x{ldc.value:x})"); break;
 
             case InstLdLocal @ldl:
                 if (ldl.local < 0) sb.Append($"(arg {(-ldl.local)-1})");
                 else sb.Append($"(local {ldl.local})");
                 break;
-            case InstLdStaticField @ldf: sb.Append($"(field {ldf.field.ToReadableReference()})"); break;
-            case InstLdField @acf: sb.Append($"(field {acf.field.ToReadableReference()})"); break;
+            case InstLdStaticField @ldf: sb.Append($"(field {ldf.StaticField.ToReadableReference()})"); break;
+            case InstLdField @acf: sb.Append($"(field {acf.StaticField.ToReadableReference()})"); break;
             
             case InstCall @call:
             {
@@ -177,11 +173,6 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter End() => AddAndReturn(new InstEnd());
         
         public InstructionWriter LdConstI1(bool value) => AddAndReturn(new InstLdConstI1(value));
-        public InstructionWriter LdConstI8(byte value) => AddAndReturn(new InstLdConstI8(value));
-        public InstructionWriter LdConstI16(ushort value) => AddAndReturn(new InstLdConstI16(value));
-        public InstructionWriter LdConstI32(uint value) => AddAndReturn(new InstLdConstI32(value));
-        public InstructionWriter LdConstI64(ulong value) => AddAndReturn(new InstLdConstI64(value));
-        public InstructionWriter LdConstI128(UInt128 value) => AddAndReturn(new InstLdConsti128(value));
         public InstructionWriter LdConstIptr(ulong value) => AddAndReturn(new InstLdConstIptr(value));
         public InstructionWriter LdConstI(byte size, BigInteger value) => AddAndReturn(new InstLdConstI(size, value));
         public InstructionWriter LdConstNull() => AddAndReturn(new InstLdConstNull());
@@ -191,17 +182,18 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         
         public InstructionWriter LdLocal(short index) => AddAndReturn(new InstLdLocal(index));
         public InstructionWriter LdLocalRef(short index) => AddAndReturn(new InstLdLocalRef(index));
-        public InstructionWriter LdStaticField(FieldBuilder r) => AddAndReturn(new InstLdStaticField(r));
-        public InstructionWriter LdStaticFieldRef() => AddAndReturn(new InstLdStaticFieldRef());
-        public InstructionWriter LdField(FieldBuilder r) => AddAndReturn(new InstLdField(r));
+        
+        public InstructionWriter LdField(StaticFieldBuilder r) => AddAndReturn(new InstLdStaticField(r));
+        public InstructionWriter LdField(InstanceFieldBuilder r) => AddAndReturn(new InstLdField(r));
         public InstructionWriter LdFieldRef() => AddAndReturn(new InstLdFieldRef());
+        //public InstructionWriter LdFieldRef() => AddAndReturn(new InstLdStaticField());
         public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new InstLdFuncRef(funcref));
         public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new InstLdTypeRef(typeref));
         public InstructionWriter LdIndex() => AddAndReturn(new InstLdIndex());
         
         public InstructionWriter StLocal(short index) => AddAndReturn(new InstStLocal(index));
-        public InstructionWriter StStaticField(FieldBuilder r) => AddAndReturn(new InstStStaticField(r));
-        public InstructionWriter StField(FieldBuilder r) => AddAndReturn(new InstStField(r));
+        public InstructionWriter StField(StaticFieldBuilder r) => AddAndReturn(new InstStStaticField(r));
+        public InstructionWriter StField(InstanceFieldBuilder r) => AddAndReturn(new InstStField(r));
         public InstructionWriter StIndex() => AddAndReturn(new InstStIndex());
         
         public InstructionWriter Extend(byte size) => AddAndReturn(new InstExtend(size));

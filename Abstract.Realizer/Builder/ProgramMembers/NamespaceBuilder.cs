@@ -6,29 +6,19 @@ public class NamespaceBuilder: ProgramMemberBuilder, INamespaceOrStructureBuilde
 {
     
     protected List<NamespaceBuilder> namespaces = [];
-    protected List<FieldBuilder> fields = [];
+    protected List<StaticFieldBuilder> fields = [];
     protected List<BaseFunctionBuilder> functions = [];
     protected List<StructureBuilder> structures = [];
     protected List<TypeDefinitionBuilder> typedefs = [];
 
-
-    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, string name) : base(null!, name) { }
-    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, NamespaceBuilder tocopy) : this(parent, tocopy.Name)
-    {
-        foreach (var i in tocopy.namespaces) namespaces.Add(new NamespaceBuilder(this, i));
-        foreach (var i in tocopy.structures) structures.Add(new StructureBuilder(this, i)); 
-        foreach (var i in tocopy.typedefs) typedefs.Add(new(this, i));
-        
-        foreach (var i in tocopy.functions)
-        {
-            switch (i)
-            {
-                case FunctionBuilder f: functions.Add(new FunctionBuilder(this, f)); break;
-                case ImportedFunctionBuilder f: functions.Add(new ImportedFunctionBuilder(this, f)); break;
-            }
-        } 
-    }
+    public NamespaceBuilder[] Namespaces => [..namespaces];
+    public StaticFieldBuilder[] Fields => [..fields]; 
+    public BaseFunctionBuilder[] Functions => [..functions];
+    public StructureBuilder[] Structures => [..structures];
+    public TypeDefinitionBuilder[] TypeDefinitions => [..typedefs];
     
+    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, string name) : base(null!, name) { }
+ 
     
     public NamespaceBuilder AddNamespace(string ns)
     {
@@ -60,9 +50,9 @@ public class NamespaceBuilder: ProgramMemberBuilder, INamespaceOrStructureBuilde
         typedefs.Add(newTypedef);
         return newTypedef;
     }
-    public FieldBuilder AddStaticField(string fn)
+    public StaticFieldBuilder AddStaticField(string fn)
     {
-        var newField = new FieldBuilder(this, fn);
+        var newField = new StaticFieldBuilder(this, fn);
         fields.Add(newField);
         return newField;
     }

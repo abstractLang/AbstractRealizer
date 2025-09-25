@@ -1,6 +1,5 @@
 using System.Numerics;
 using Abstract.Realizer.Builder.ProgramMembers;
-using FieldBuilder = Abstract.Realizer.Builder.ProgramMembers.FieldBuilder;
 using TypeBuilder = Abstract.Realizer.Builder.ProgramMembers.TypeBuilder;
 
 using i16 = short;
@@ -125,37 +124,6 @@ public readonly struct InstLdConstI1(u1 value) : IOmegaInstruction
     public readonly u1 value = value;
     public override string ToString() => $"ld.const.i1 {value}";
 }
-
-public readonly struct InstLdConstI8(u8 value) : IOmegaInstruction
-{
-    public readonly u8 value = value;
-    public override string ToString() => $"ld.const.i8 0x{value:x} ;;{value}";
-}
-
-public readonly struct InstLdConstI16(u16 value) : IOmegaInstruction
-{
-    public readonly u16 value = value;
-    public override string ToString() => $"ld.const.i16 0x{value:x} ;;{value}";
-}
-
-public readonly struct InstLdConstI32(u32 value) : IOmegaInstruction
-{
-    public readonly u32 value = value;
-    public override string ToString() => $"ld.const.i32 0x{value:x} ;;{value}";
-}
-
-public readonly struct InstLdConstI64(u64 value) : IOmegaInstruction
-{
-    public readonly u64 value = value;
-    public override string ToString() => $"ld.const.i64 0x{value:x} ;;{value}";
-}
-
-public readonly struct InstLdConsti128(u128 value) : IOmegaInstruction
-{
-    public readonly u128 value = value;
-    public override string ToString() => $"ld.const.i128 0x{value:x} ;;{value}";
-}
-
 public readonly struct InstLdConstIptr(u64 value) : IOmegaInstruction
 {
     public readonly u64 value = value;
@@ -202,25 +170,25 @@ public readonly struct InstLdLocalRef(i16 index) : IOmegaInstruction
             : $"ld.local.ref ${index}";
 }
 
-public readonly struct InstLdStaticField(FieldBuilder r) : IOmegaInstruction
+public readonly struct InstLdStaticField(StaticFieldBuilder r) : IOmegaInstruction
 {
-    public readonly FieldBuilder field = r;
-    public override string ToString() => $"ld.static.field {field.ToReadableReference()}";
+    public readonly StaticFieldBuilder StaticField = r;
+    public override string ToString() => $"ld.static.field {StaticField.ToReadableReference()}";
 }
 
 public readonly struct InstLdStaticFieldRef() : IOmegaInstruction
 {
     public override string ToString() => $"ld.static.field.ref";
 }
-public readonly struct InstLdField(FieldBuilder r) : IOmegaInstruction
+public readonly struct InstLdField(InstanceFieldBuilder r) : IOmegaInstruction
 {
-    public readonly FieldBuilder field = r;
-    public override string ToString() => $"ld.field {field.ToReadableReference()}";
+    public readonly InstanceFieldBuilder StaticField = r;
+    public override string ToString() => $"ld.field {StaticField.ToReadableReference()}";
 }
 
-public readonly struct InstLdFieldRef(FieldBuilder r) : IOmegaInstruction
+public readonly struct InstLdFieldRef(StaticFieldBuilder r) : IOmegaInstruction
 {
-    public readonly FieldBuilder field = r;
+    public readonly StaticFieldBuilder StaticField = r;
     public override string ToString() => $"ld.field.ref";
 }
 
@@ -249,14 +217,14 @@ public readonly struct InstStLocal(i16 index) : IOmegaInstruction
                 : $"st.local ${index}";
 }
 
-public readonly struct InstStStaticField(FieldBuilder f) : IOmegaInstruction
+public readonly struct InstStStaticField(StaticFieldBuilder f) : IOmegaInstruction
 {
-    public readonly FieldBuilder field = f;
+    public readonly StaticFieldBuilder StaticField = f;
     public override string ToString() => $"st.static.field {f.ToReadableReference()}";
 }
-public readonly struct InstStField(FieldBuilder f) : IOmegaInstruction
+public readonly struct InstStField(InstanceFieldBuilder f) : IOmegaInstruction
 {
-    public readonly FieldBuilder field = f;
+    public readonly InstanceFieldBuilder StaticField = f;
     public override string ToString() => $"st.field {f.ToReadableReference()}";
 }
 

@@ -4,35 +4,27 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
 {
-    protected List<FieldBuilder> fields = [];
-    protected List<BaseFunctionBuilder> functions = [];
+    public List<InstanceFieldBuilder> Fields = [];
+    public List<BaseFunctionBuilder> Functions = [];
+
+
+    public uint? Length = null;
+    public uint? Alignment = null;
     
     
     internal StructureBuilder(INamespaceOrStructureBuilder parent, string name): base(parent, name) {}
-    internal StructureBuilder(INamespaceOrStructureBuilder parent, StructureBuilder tocopy) : this(parent, tocopy.Name)
-    {
-        foreach (var i in tocopy.fields) fields.Add(new(this, i));
-        foreach (var i in tocopy.functions)
-        {
-            switch (i)
-            {
-                case FunctionBuilder f: functions.Add(new FunctionBuilder(this, f)); break;
-                case ImportedFunctionBuilder f: functions.Add(new ImportedFunctionBuilder(this, f)); break;
-            }
-        } 
-    }
     
     
-    public FieldBuilder AddField(string fn)
+    public InstanceFieldBuilder AddField(string fn)
     {
-        var newField = new FieldBuilder(this, fn);
-        fields.Add(newField);
+        var newField = new InstanceFieldBuilder(this, fn);
+        Fields.Add(newField);
         return newField;
     }
     public FunctionBuilder AddFunction(string fn)
     {
         var newFunction = new FunctionBuilder(this, fn);
-        functions.Add(newFunction);
+        Functions.Add(newFunction);
         return newFunction;
     }
     
@@ -42,13 +34,18 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
         var sb = new StringBuilder();
 
         sb.AppendLine($"(struct \"{Name}\"");
-        foreach (var i in fields) sb.AppendLine(i.ToString().TabAllLines());
-        foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());
+        
+        if (Length != null || Alignment != null) sb.Append('\t');
+        if (Length != null) sb.Append($"(length {Length}) ");
+        if (Alignment != null) sb.Append($"(alignment {Alignment})");
+        if (Length != null || Alignment != null) sb.AppendLine();
+        
+        foreach (var i in Fields) sb.AppendLine(i.ToString().TabAllLines());
+        foreach (var i in Functions) sb.AppendLine(i.ToString().TabAllLines());
         sb.Length -= Environment.NewLine.Length;
         sb.Append(')');
         
         return sb.ToString();
     }
-    
     public override string ToReadableReference() => '"' + string.Join('.', GlobalIdentifier) + '"';
 }
