@@ -4,16 +4,13 @@ public class BetaOutputConfiguration : ILanguageOutputConfiguration
 {
     public bool BakeGenerics { get; set; }
     public byte MemoryUnit { get; set; }
-
-    public BetaExtendableInstructionSet EnabledOpcodes { get; set; } = BetaExtendableInstructionSet.All;
-    public BetaExtendableScopes EnabledScopes { get; set; } = BetaExtendableScopes.All;
     
-    public bool SizedOperations { get; set; } = true;
+    public BetaExtendableInstructionSet EnabledOpcodes { get; set; } = BetaExtendableInstructionSet.None;
+    public BetaExtendableScopes EnabledScopes { get; set; } = BetaExtendableScopes.None;
     
-    
-
-    
+    public BetaSizedOperationsOptions SizedOperations { get; set; } =  BetaSizedOperationsOptions.None;
 }
+
 [Flags]
 public enum BetaExtendableInstructionSet
 {
@@ -35,4 +32,18 @@ public enum BetaExtendableScopes
         Loop = (1 << 1),
         IfElse = (1 << 2),
         Switch = (1 << 3),
+}
+
+[Flags]
+public enum BetaSizedOperationsOptions
+{
+    None = 0,
+    All = int.MaxValue,
+    
+    IntegerSigness = (1 << 0),
+    IntegerSize = (1 << 1),
+    
+    FloatingSize = (1 << 2),
+    
+    Object = (1 << 3),
 }

@@ -1,5 +1,7 @@
 using Abstract.Realizer.Builder;
+using Abstract.Realizer.Builder.Language.Beta;
 using Abstract.Realizer.Builder.ProgramMembers;
+using Abstract.Realizer.Compiler;
 using Abstract.Realizer.Core.Configuration.LangOutput;
 using Abstract.Realizer.Core.Intermediate;
 using Abstract.Realizer.Core.Intermediate.Language;
@@ -55,6 +57,8 @@ public class RealizerProcessor
     }
     public ProgramBuilder Compile()
     {
+        stage++;
+        
         LanguageOutput compileTo = configuration switch
         {
             AlphaOutputConfiguration => LanguageOutput.Alpha,
@@ -63,6 +67,23 @@ public class RealizerProcessor
         };
         if (Verbose) Console.WriteLine($"Realizer: Compiling to {compileTo}...");
 
+        foreach (var function in functions)
+        {
+            switch (compileTo)
+            {
+                case LanguageOutput.Alpha: throw new NotImplementedException();
+                
+                case LanguageOutput.Beta:
+                    if (function.Key.BytecodeBuilder is BetaBytecodeBuilder) continue;
+                    BetaCompiler.CompileFunction(function.Key, function.Value,
+                        (BetaOutputConfiguration)configuration);
+                    break;
+            }
+        }
+
+        if (DebugDumpPath != null)
+            File.WriteAllTextAsync(Path.Combine(DebugDumpPath, $"Stage{stage}.txt"), program.ToString());
+        
         return program;
     }
     

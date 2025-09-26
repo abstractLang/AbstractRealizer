@@ -1,12 +1,15 @@
+using Abstract.Realizer.Core.Intermediate.Types;
+
 namespace Abstract.Realizer.Core.Intermediate.Language;
 
-internal class IrBinaryOp(BinaryOperation op, IrValue left, IrValue right) : IrValue
+internal class IrBinaryOp(RealizerType type, BinaryOperation op, IrValue left, IrValue right) : IrValue
 {
-    public readonly BinaryOperation Op;
-    public readonly IrValue Left;
-    public readonly IrValue Right;
+    public readonly RealizerType Type = type;
+    public readonly BinaryOperation Op = op;
+    public readonly IrValue Left = left;
+    public readonly IrValue Right = right;
 
-    public override string ToString() => $"({op.ToString().Replace('_', '.')}"
+    public override string ToString() => $"({Type}.{op.ToString().Replace('_', '.')}"
                                          + $"\n{Left.ToString().TabAllLines()}"
                                          + $"\n{Right.ToString().TabAllLines()})";
 }

@@ -2,10 +2,10 @@ using System.Numerics;
 
 namespace Abstract.Realizer.Core.Intermediate.Language;
 
-internal class IrInteger(int? bits, BigInteger value): IrValue
+internal class IrInteger(byte? size, BigInteger value): IrValue
 {
-    public readonly int? Bits = bits;
+    public readonly byte? Size = size;
     public readonly BigInteger Value = value;
 
-    public override string ToString() => "(const " + (Bits.HasValue ? Bits.Value : "ptr")+ $") {Value}";
+    public override string ToString() => "(const " + (Size.HasValue ? Size.Value : "ptr")+ $" {Value})";
 }

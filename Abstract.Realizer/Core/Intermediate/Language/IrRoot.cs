@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Abstract.Realizer.Core.Intermediate.Language;
 
-internal class IrRoot
+internal class IrRoot: IrNode
 {
     public List<IrNode> content = [];
 

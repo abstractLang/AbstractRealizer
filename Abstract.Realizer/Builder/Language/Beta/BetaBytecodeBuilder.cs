@@ -1,4 +1,6 @@
+using System.Numerics;
 using System.Text;
+using Abstract.Realizer.Builder.ProgramMembers;
 
 namespace Abstract.Realizer.Builder.Language.Beta;
 
@@ -8,18 +10,16 @@ public class BetaBytecodeBuilder : BytecodeBuilder
     public List<IBetaInstruction> InstructionsList => _instructions;
     public InstructionWriter Writer => new(this);
 
-
-    public override object Clone()
-    {
-        var clone = new BetaBytecodeBuilder();
-        _instructions = _instructions.ToList();
-        return clone;
-    }
+    
     public override string ToString()
     {
         var sb = new StringBuilder();
 
-        foreach (var i in _instructions) sb.AppendLine(i.ToString());
+        foreach (var i in _instructions)
+        {
+            sb.Append(i);
+            if (i is not IBetaFlag) sb.AppendLine();
+        }
 
         return sb.ToString();
     }
@@ -34,5 +34,39 @@ public class BetaBytecodeBuilder : BytecodeBuilder
             _parentBuilder._instructions.Add(value);
             return this;
         }
+        
+        
+        public InstructionWriter Nop() => AddAndReturn(new InstNop());
+        public InstructionWriter Invalid() => AddAndReturn(new InstInvalid());
+        public InstructionWriter Pop() => AddAndReturn(new InstPop());
+        public InstructionWriter Dup() => AddAndReturn(new InstDup());
+        public InstructionWriter Swap() => AddAndReturn(new InstSwap());
+        public InstructionWriter Call(BaseFunctionBuilder func) => AddAndReturn(new InstCall(func));
+        public InstructionWriter CallVirt() => AddAndReturn(new InstCallVirt());
+        public InstructionWriter Ret() => AddAndReturn(new InstRet());
+        public InstructionWriter Break() => AddAndReturn(new InstBreak());
+
+        
+        public InstructionWriter LdConstI(byte size, BigInteger value) => AddAndReturn(new InstLdConstI(size, value));
+        public InstructionWriter LdConstIptr(BigInteger value) => AddAndReturn(new InstLdConstIptr(value));
+        public InstructionWriter LdLocal(short index) => AddAndReturn(new InstLdLocal(index));
+        public InstructionWriter LdField(FieldBuilder field) => AddAndReturn(new InstLdField(field));
+        
+        
+        public InstructionWriter StLocal(short index) => AddAndReturn(new InstStLocal(index));
+        public InstructionWriter StField(FieldBuilder field) => AddAndReturn(new InstStField(field));
+
+
+        public InstructionWriter Add() => AddAndReturn(new InstAdd());
+        public InstructionWriter Sub() => AddAndReturn(new InstSub());
+        public InstructionWriter Mul() => AddAndReturn(new InstMul());
+        public InstructionWriter Div() => AddAndReturn(new InstDiv());
+        
+        
+        public InstructionWriter Extend(byte size) => AddAndReturn(new InstExtend(size));
+        public InstructionWriter Trunc(byte size) => AddAndReturn(new InstTrunc(size));
+        
+        
+        public InstructionWriter TypeInt(bool signed, byte? size) => AddAndReturn(new FlagIntTyped(signed, size));
     }
 }

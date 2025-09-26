@@ -12,12 +12,6 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
     public InstructionWriter Writer => new(this);
     
     
-    public override object Clone()
-    {
-        var clone = new OmegaBytecodeBuilder();
-        clone._instructions = _instructions.ToList();
-        return clone;
-    }
     public override string ToString()
     {
         var sb = new StringBuilder();
@@ -25,7 +19,17 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         while (q.Count > 0) WriteInstruction(sb, q);
 
         sb.AppendLine();
-        foreach (var i in _instructions) sb.AppendLine(";; " + i);
+        var newline = true;
+        foreach (var i in _instructions)
+        {
+            if (newline) sb.Append(";; ");
+            newline = false;
+            sb.Append(i);
+            
+            if (i is IOmegaFlag) continue;
+            sb.AppendLine();
+            newline = true;
+        }
         
         return sb.ToString();
     }
@@ -83,13 +87,13 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         var a = instQueue.Dequeue();
         switch (a)
         {
-            case InstNot: sb.Append($"(not\n\t{WriteInstructionValue(instQueue)})"); break;
-            case InstAdd: sb.Append($"(add" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstMul @m: sb.Append($"(mul." + (m.signed ? 's' : 'u') +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstNot: sb.Append($"not\n\t{WriteInstructionValue(instQueue)})"); break;
+            case InstAdd: sb.Append($"add" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstMul: sb.Append($"mul" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
             
             case InstSigcast @s: sb.Append("(sigcast." + (s.segned ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
             case InstTrunc @t: sb.Append($"(trunc {t.len} {WriteInstructionValue(instQueue)})"); break;
@@ -116,6 +120,15 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
 
             case InstLdNewObject @newobj:
                 sb.Append($"newobj({newobj.type.ToReadableReference()})");
+                break;
+            
+            case FlagTypeInt @tint:
+                sb.Append("(" + (tint.Signed ? "s" : "u") + (tint.Size.HasValue ? $"{tint.Size}" : "ptr") + '.');
+                sb.Append(WriteInstructionValue(instQueue));
+                break;
+            case FlagTypeFloat @tflo:
+                sb.Append($"f{tflo.Size}.");
+                sb.Append(WriteInstructionValue(instQueue));
                 break;
             
             default: throw new NotImplementedException();
@@ -152,9 +165,9 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         
         public InstructionWriter Add() => AddAndReturn(new InstAdd());
         public InstructionWriter Sub() => AddAndReturn(new InstSub());
-        public InstructionWriter Mul(bool signed) => AddAndReturn(new InstMul(signed));
-        public InstructionWriter Div(bool signed) => AddAndReturn(new InstDiv(signed));
-        public InstructionWriter Rem(bool signed) => AddAndReturn(new InstRem(signed));
+        public InstructionWriter Mul() => AddAndReturn(new InstMul());
+        public InstructionWriter Div() => AddAndReturn(new InstDiv());
+        public InstructionWriter Rem() => AddAndReturn(new InstRem());
         public InstructionWriter Neg() => AddAndReturn(new InstNeg());
         public InstructionWriter Not() => AddAndReturn(new InstNot());
         public InstructionWriter And() => AddAndReturn(new InstAnd());
@@ -207,5 +220,9 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         
         public InstructionWriter AllowOvf() => AddAndReturn(new FlagAllowOvf());
         public InstructionWriter AllowNil() => AddAndReturn(new FlagAllowNil());
+        
+        public InstructionWriter TypeInt(bool signed, byte? size) => AddAndReturn(new FlagTypeInt(signed, size));
+        public InstructionWriter TypeFloat(byte size) => AddAndReturn(new FlagTypeFloat(size));
+        public InstructionWriter TypeObj() => AddAndReturn(new FlagTypeObject());
     }
 }

@@ -6,15 +6,10 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public class FunctionBuilder: BaseFunctionBuilder
 {
-    public BytecodeBuilder? BytecodeBuilder { get; private set;  }
+    public BytecodeBuilder? BytecodeBuilder { get; internal set;  }
   
     
     internal FunctionBuilder(INamespaceOrStructureBuilder parent, string name) : base(parent, name) { }
-    internal FunctionBuilder(INamespaceOrStructureBuilder parent, FunctionBuilder tocopy) : this(parent, tocopy.Name)
-    {
-        BytecodeBuilder = (BytecodeBuilder?)tocopy.BytecodeBuilder?.Clone();
-    }
-    
     
     
     public OmegaBytecodeBuilder GetOrCreateOmegaBuilder()

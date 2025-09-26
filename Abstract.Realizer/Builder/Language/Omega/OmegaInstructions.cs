@@ -14,12 +14,13 @@ namespace Abstract.Realizer.Builder.Language.Omega;
 
 public interface IOmegaInstruction { }
 public interface IOmegaFlag: IOmegaInstruction { }
+public interface IOmegaTypePrefix { }
+public interface IOmegaRequiresTypePrefix { }
 
 public readonly struct InstNop : IOmegaInstruction
 {
     public override string ToString() => "nop";
 }
-
 public readonly struct InstInvalid : IOmegaInstruction
 {
     public override string ToString() => "invalid";
@@ -41,73 +42,59 @@ public readonly struct InstRet(bool value) : IOmegaInstruction
     public override string ToString() => "ret" + (value ? "v" : "");
 }
 
-public readonly struct InstAdd : IOmegaInstruction
+public readonly struct InstAdd : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "add";
 }
-
-public readonly struct InstSub : IOmegaInstruction
+public readonly struct InstSub : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "sub";
 }
-
-public readonly struct InstMul(u1 signed) : IOmegaInstruction
+public readonly struct InstMul : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
-    public readonly bool signed = signed;
-    public override string ToString() => "mul." + (signed ? 's' : 'u');
+    public override string ToString() => "mul";
 }
-
-public readonly struct InstDiv(u1 signed) : IOmegaInstruction
+public readonly struct InstDiv : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
-    public override string ToString() => "div." + (signed ? 's' : 'u');
+    public override string ToString() => "div";
 }
-
-public readonly struct InstRem(u1 signed) : IOmegaInstruction
+public readonly struct InstRem : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
-    public override string ToString() => "rem." + (signed ? 's' : 'u');
+    public override string ToString() => "rem";
 }
-
-public readonly struct InstNeg : IOmegaInstruction
+public readonly struct InstNeg : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "neg";
 }
-
-public readonly struct InstNot : IOmegaInstruction
+public readonly struct InstNot : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "not";
 }
-
-public readonly struct InstAnd : IOmegaInstruction
+public readonly struct InstAnd : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "and";
 }
-
-public readonly struct InstOr : IOmegaInstruction
+public readonly struct InstOr : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "or";
 }
-
-public readonly struct InstXor : IOmegaInstruction
+public readonly struct InstXor : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "xor";
 }
-
-public readonly struct InstShr : IOmegaInstruction
+public readonly struct InstShr : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "shr";
 }
-
-public readonly struct InstShl : IOmegaInstruction
+public readonly struct InstShl : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "shl";
 }
-
-public readonly struct InstRor : IOmegaInstruction
+public readonly struct InstRor : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "ror";
 }
-
-public readonly struct InstRol : IOmegaInstruction
+public readonly struct InstRol : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "rol";
 }
@@ -260,12 +247,10 @@ public readonly struct InstMemCopy : IOmegaInstruction
 {
     public override string ToString() => "mem.copy";
 }
-
 public readonly struct InstMemFill : IOmegaInstruction
 {
     public override string ToString() => "mem.fill";
 }
-
 public readonly struct InstMemEq : IOmegaInstruction
 {
     public override string ToString() => "mem.eq";
@@ -275,10 +260,25 @@ public readonly struct FlagAllowOvf : IOmegaFlag
 {
     public override string ToString() => "allow.ovf.";
 }
-
 public readonly struct FlagAllowNil : IOmegaFlag
 {
     public override string ToString() => "allow.nil.";
+}
+
+public readonly struct FlagTypeInt(bool signed, u8? size) : IOmegaFlag, IOmegaTypePrefix
+{
+    public readonly bool Signed = signed;
+    public readonly byte? Size = size;
+    public override string ToString() => (Signed ? 's' : 'u') + (Size.HasValue ? $"{Size.Value}" : "int") + '.';
+}
+public readonly struct FlagTypeFloat(u8 size) : IOmegaFlag, IOmegaTypePrefix
+{
+    public readonly byte Size = size;
+    public override string ToString() => $"f{Size}.";
+}
+public readonly struct FlagTypeObject() : IOmegaFlag, IOmegaTypePrefix
+{
+    public override string ToString() => "obj.";
 }
 
 public readonly struct InstSrcOffsetGlobal(u32 off): IOmegaInstruction { }

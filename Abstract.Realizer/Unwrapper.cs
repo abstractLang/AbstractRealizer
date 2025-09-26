@@ -3,6 +3,7 @@ using Abstract.Realizer.Builder.Language.Omega;
 using Abstract.Realizer.Builder.ProgramMembers;
 using Abstract.Realizer.Core.Intermediate;
 using Abstract.Realizer.Core.Intermediate.Language;
+using Abstract.Realizer.Core.Intermediate.Types;
 
 namespace Abstract.Realizer;
 
@@ -17,7 +18,7 @@ internal static class Unwrapper
         var root = new IrRoot();
         Queue<IOmegaInstruction> queue = function.BytecodeBuilder switch
         {
-            OmegaBytecodeBuilder @omega => new(omega.InstructionsList),
+            OmegaBytecodeBuilder @omega => new Queue<IOmegaInstruction>(omega.InstructionsList),
             _ => throw new ArgumentException("function do not has a valid input bytecode!")
         };
 
@@ -68,6 +69,8 @@ internal static class Unwrapper
         var a = instructions.Dequeue();
         IrValue r = a switch
         {
+            IOmegaRequiresTypePrefix => throw new Exception($"instruction \"{a}\" expects type prefix"),
+            
             InstLdLocal @ldlocal => new IrLocal(ldlocal.local),
             InstLdNewObject @newobj => new IrNewObj(newobj.type),
             
@@ -79,22 +82,12 @@ internal static class Unwrapper
             InstLdConstIptr @ldcp => new IrInteger(null, ldcp.value),
             
             InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Length)),
-            
-            InstAdd => new IrBinaryOp(BinaryOperation.add,
-                    UnwrapValue(instructions),
-                    UnwrapValue(instructions)),
                 
-            InstSub => new IrBinaryOp(BinaryOperation.sub,
-                    UnwrapValue(instructions),
-                    UnwrapValue(instructions)),
-            
-            InstMul @m => new IrBinaryOp(m.signed ? BinaryOperation.mul_s : BinaryOperation.mul_u,
-                    UnwrapValue(instructions),
-                    UnwrapValue(instructions)),
-            
             InstExtend @e => new IrExtend(e.len, UnwrapValue(instructions)),
             InstTrunc @t => new IrTrunc(t.len, UnwrapValue(instructions)),
 
+            IOmegaTypePrefix @tprefix => UnwrapValueTyped(tprefix, instructions),
+            
             _ => throw new UnreachableException(),
         };
                 
@@ -106,6 +99,33 @@ internal static class Unwrapper
         }
 
         return r;
+    }
+
+    private static IrValue UnwrapValueTyped(IOmegaTypePrefix type, Queue<IOmegaInstruction> instructions)
+    {
+        RealizerType typeref = type switch
+        {
+            FlagTypeInt @typei => new IntegerType(typei.Signed, typei.Size),
+            _ => throw new UnreachableException(),
+        };
+        
+        var a = instructions.Dequeue();
+        return a switch
+        {
+            InstAdd => new IrBinaryOp(typeref, BinaryOperation.add,
+                UnwrapValue(instructions),
+                UnwrapValue(instructions)),
+
+            InstSub => new IrBinaryOp(typeref, BinaryOperation.sub,
+                UnwrapValue(instructions),
+                UnwrapValue(instructions)),
+
+            InstMul => new IrBinaryOp(typeref, BinaryOperation.mul,
+                UnwrapValue(instructions),
+                UnwrapValue(instructions)),
+
+            _ => throw new Exception("Instruction \"a\" does not allows type prefix"),
+        };
     }
 
     private static IrValue[] UnwrapValues(Queue<IOmegaInstruction> instructions, int count)
