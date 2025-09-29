@@ -1,11 +1,18 @@
 using System.Numerics;
-using System.Reflection;
 using Abstract.Realizer.Builder.ProgramMembers;
+using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.Language.Beta;
 
 public interface IBetaInstruction { }
 public interface IBetaFlag: IBetaInstruction { }
+public interface IBetaMacro: IBetaInstruction { }
+
+public enum GlobalVariables
+{
+    StackBase,
+    StackPointer,
+}
 
 
 public readonly struct InstNop : IBetaInstruction
@@ -72,6 +79,12 @@ public readonly struct InstLdField(FieldBuilder field) : IBetaInstruction
     public readonly FieldBuilder Field = field;
     public override string ToString() => $"ld.field {Field.ToReadableReference()}";
 }
+public readonly struct InstLdGlobal(GlobalVariables variable) : IBetaInstruction
+{
+    public readonly GlobalVariables Variable = variable;
+    public override string ToString() => $"ld.global {Variable}";
+}
+
 
 public readonly struct InstStLocal(short index) : IBetaInstruction
 {
@@ -82,6 +95,11 @@ public readonly struct InstStField(FieldBuilder field) : IBetaInstruction
 {
     public readonly FieldBuilder Field = field;
     public override string ToString() => $"st.field {Field.ToReadableReference()}";
+}
+public readonly struct InstStGlobal(GlobalVariables variable) : IBetaInstruction
+{
+    public readonly GlobalVariables Variable = variable;
+    public override string ToString() => $"st.global {Variable}";
 }
 
 
@@ -103,15 +121,24 @@ public readonly struct InstDiv() : IBetaInstruction
 }
 
 
-public readonly struct InstExtend(byte size) : IBetaInstruction
+public readonly struct InstExtend() : IBetaInstruction
 {
-    public readonly byte Size = size;
-    public override string ToString() => $"extend {Size}";
+    public override string ToString() => "extend";
 }
-public readonly struct InstTrunc(byte size) : IBetaInstruction
+public readonly struct InstTrunc() : IBetaInstruction
 {
-    public readonly byte Size = size;
-    public override string ToString() => $"trunc {Size}";
+    public override string ToString() => "trunc";
+}
+
+
+public readonly struct InstMStackEnter(StructureBuilder stackFrame) : IBetaInstruction
+{
+    public readonly StructureBuilder StackFrame = stackFrame;
+    public override string ToString() => $"mstack.enter {StackFrame.ToReadableReference()}";
+}
+public readonly struct InstMStackLeave() : IBetaInstruction
+{
+    public override string ToString() => "mstack.leave";
 }
 
 
@@ -120,4 +147,11 @@ public readonly struct FlagIntTyped(bool signed, byte? size) : IBetaFlag
     public readonly bool Signed = signed;
     public readonly byte? Size = size;
     public override string ToString() => (Signed ? "s" : "u") + $"{Size}.";
+}
+
+
+public readonly struct MacroDefineLocal(TypeReference t) : IBetaMacro
+{
+    public readonly TypeReference Type = t;
+    public override string ToString() => $"$DEFINE_LOCAL {Type}";
 }

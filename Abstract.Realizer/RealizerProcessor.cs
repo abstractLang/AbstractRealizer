@@ -20,7 +20,7 @@ public class RealizerProcessor
     private bool processRunning = false;
     private int stage = 0;
     
-    private Dictionary<FunctionBuilder, IrRoot> functions = [];
+    private List<FunctionBuilder> functions = [];
     private List<StaticFieldBuilder> fields = [];
     private List<StructureBuilder> structs = [];
     private List<TypeDefinitionBuilder> typedefs = [];
@@ -37,23 +37,10 @@ public class RealizerProcessor
             File.WriteAllTextAsync(Path.Combine(DebugDumpPath, "Stage0.txt"), program.ToString());
         
         UnwrapRecursive(program);
-    }
-    public void Optimize(OptimizationOption optimization)
-    {
-        stage++;
-        if (Verbose) Console.WriteLine($"Realizer: Optimizing ({optimization})...");
         
-        switch (optimization)
-        {
-            case OptimizationOption.PackStructures:
-                ObjectBaker.BakeTypeMetadata(configuration, [.. structs], [.. typedefs]);
-                break;
-            
-            default: throw new ArgumentOutOfRangeException(nameof(optimization), optimization, null);
-        }
-        
-        if (DebugDumpPath != null)
-            File.WriteAllTextAsync(Path.Combine(DebugDumpPath, $"Stage{stage}.txt"), program.ToString());
+        Optimize(OptimizationOption.ExpandMacros);
+        Optimize(OptimizationOption.Unnest);
+        Optimize(OptimizationOption.PackStructures);
     }
     public ProgramBuilder Compile()
     {
@@ -63,6 +50,7 @@ public class RealizerProcessor
         {
             AlphaOutputConfiguration => LanguageOutput.Alpha,
             BetaOutputConfiguration => LanguageOutput.Beta,
+            OmegaOutputConfiguration => LanguageOutput.Omega,
             _ => throw new ArgumentOutOfRangeException(),
         };
         if (Verbose) Console.WriteLine($"Realizer: Compiling to {compileTo}...");
@@ -74,9 +62,8 @@ public class RealizerProcessor
                 case LanguageOutput.Alpha: throw new NotImplementedException();
                 
                 case LanguageOutput.Beta:
-                    if (function.Key.BytecodeBuilder is BetaBytecodeBuilder) continue;
-                    BetaCompiler.CompileFunction(function.Key, function.Value,
-                        (BetaOutputConfiguration)configuration);
+                    if (function.BytecodeBuilder is BetaBytecodeBuilder) continue;
+                    BetaCompiler.CompileFunction(function, (BetaOutputConfiguration)configuration);
                     break;
             }
         }
@@ -85,6 +72,32 @@ public class RealizerProcessor
             File.WriteAllTextAsync(Path.Combine(DebugDumpPath, $"Stage{stage}.txt"), program.ToString());
         
         return program;
+    }
+    
+    private void Optimize(OptimizationOption optimization)
+    {
+        stage++;
+        if (Verbose) Console.WriteLine($"Realizer: Optimizing ({optimization})...");
+        
+        switch (optimization)
+        {
+            case OptimizationOption.PackStructures:
+                ObjectBaker.BakeTypeMetadata(configuration, [.. structs], [.. typedefs]);
+                break;
+            
+            case OptimizationOption.ExpandMacros:
+                foreach (var function in functions) MacroExpander.ExpandFunctionMacros(function, configuration);
+                break;
+            
+            case OptimizationOption.Unnest:
+                Unnester.UnnestProgram(program);
+                break;
+            
+            default: throw new ArgumentOutOfRangeException(nameof(optimization), optimization, null);
+        }
+        
+        if (DebugDumpPath != null)
+            File.WriteAllTextAsync(Path.Combine(DebugDumpPath, $"Stage{stage}.txt"), program.ToString());
     }
     
     
@@ -105,7 +118,8 @@ public class RealizerProcessor
                 break;
             
             case FunctionBuilder @f:
-                functions.Add(f, Unwrapper.UnwerapFunction(f));
+                f._intermediateRoot = Unwrapper.UnwerapFunction(f);
+                functions.Add(f);
                 break;
             
             case StructureBuilder @s:
@@ -133,7 +147,10 @@ public class RealizerProcessor
     }
     public enum OptimizationOption
     {
-        PackStructures
+        NormalizeMemoryStack,
+        ExpandMacros,
+        Unnest,
+        PackStructures,
     }
     
 }

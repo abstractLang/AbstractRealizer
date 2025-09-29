@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text;
 using Abstract.Realizer.Builder.ProgramMembers;
+using Abstract.Realizer.Builder.References;
 using TypeBuilder = Abstract.Realizer.Builder.ProgramMembers.TypeBuilder;
 
 namespace Abstract.Realizer.Builder.Language.Omega;
@@ -40,6 +41,12 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         var a = instQueue.Peek();
         switch (a)
         {
+            case MacroDefineLocal @dl:
+                instQueue.Dequeue();
+                sb.Append($"$DEFINE_LOCAL {dl.Type}");
+                break;
+            
+            
             case InstNop:
                 instQueue.Dequeue();
                 sb.Append("nop");
@@ -95,17 +102,17 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
             
-            case InstSigcast @s: sb.Append("(sigcast." + (s.segned ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
-            case InstTrunc @t: sb.Append($"(trunc {t.len} {WriteInstructionValue(instQueue)})"); break;
-            case InstExtend @e: sb.Append($"(extend {e.len} {WriteInstructionValue(instQueue)})"); break;
+            case InstSigcast @s: sb.Append("(sigcast." + (s.Signed ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
+            case InstTrunc @t: sb.Append($"trunc {WriteInstructionValue(instQueue)})"); break;
+            case InstExtend @e: sb.Append($"extend {WriteInstructionValue(instQueue)})"); break;
             
-            case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.len} 0x{ldconsti.value:x})"); break;
-            case InstLdConstI1 @ldc: sb.Append("(const 1 " + (ldc.value ? "true" : "false" + ")")); break;
-            case InstLdConstIptr @ldc: sb.Append($"(const ptr 0x{ldc.value:x})"); break;
+            case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.Len} 0x{ldconsti.Value:x})"); break;
+            case InstLdConstI1 @ldc: sb.Append("(const 1 " + (ldc.Value ? "true" : "false" + ")")); break;
+            case InstLdConstIptr @ldc: sb.Append($"(const ptr 0x{ldc.Value:x})"); break;
 
             case InstLdLocal @ldl:
-                if (ldl.local < 0) sb.Append($"(arg {(-ldl.local)-1})");
-                else sb.Append($"(local {ldl.local})");
+                if (ldl.Local < 0) sb.Append($"(arg {(-ldl.Local)-1})");
+                else sb.Append($"(local {ldl.Local})");
                 break;
             case InstLdStaticField @ldf: sb.Append($"(field {ldf.StaticField.ToReadableReference()})"); break;
             case InstLdField @acf: sb.Append($"(field {acf.StaticField.ToReadableReference()})"); break;
@@ -119,7 +126,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             } break;
 
             case InstLdNewObject @newobj:
-                sb.Append($"newobj({newobj.type.ToReadableReference()})");
+                sb.Append($"newobj({newobj.Type.ToReadableReference()})");
                 break;
             
             case FlagTypeInt @tint:
@@ -153,6 +160,9 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
 
         private InstructionWriter AddAndReturn(IOmegaInstruction value)
         {
+            if (value is IOmegaRequiresTypePrefix && _parentBuilder._instructions[^1] is not IOmegaTypePrefix)
+                throw new Exception($"Instruction '{value}' expects type prefix");
+                
             _parentBuilder._instructions.Add(value);
             return this;
         }
@@ -209,8 +219,8 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter StField(InstanceFieldBuilder r) => AddAndReturn(new InstStField(r));
         public InstructionWriter StIndex() => AddAndReturn(new InstStIndex());
         
-        public InstructionWriter Extend(byte size) => AddAndReturn(new InstExtend(size));
-        public InstructionWriter Trunc(byte size) => AddAndReturn(new InstTrunc(size));
+        public InstructionWriter Extend() => AddAndReturn(new InstExtend());
+        public InstructionWriter Trunc() => AddAndReturn(new InstTrunc());
         public InstructionWriter Sigcast(bool signess) => AddAndReturn(new InstSigcast(signess));
         public InstructionWriter Bitcast() => AddAndReturn(new InstBitcast());
         
@@ -224,5 +234,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter TypeInt(bool signed, byte? size) => AddAndReturn(new FlagTypeInt(signed, size));
         public InstructionWriter TypeFloat(byte size) => AddAndReturn(new FlagTypeFloat(size));
         public InstructionWriter TypeObj() => AddAndReturn(new FlagTypeObject());
+        
+        public InstructionWriter MacroDefineLocal(TypeReference typer) => AddAndReturn(new MacroDefineLocal(typer));
     }
 }

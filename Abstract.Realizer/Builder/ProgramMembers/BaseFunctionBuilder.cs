@@ -5,25 +5,17 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public abstract class BaseFunctionBuilder: ProgramMemberBuilder
 {
-    protected List<(string, TypeReference)> parameters = [];
-    protected List<TypeReference> locals = [];
+    public List<(string name, TypeReference type)> Parameters = [];
     
-    public (string, TypeReference)[] Parameters => [.. parameters];
-    
-    
-    internal BaseFunctionBuilder(INamespaceOrStructureBuilder parent, string name) : base(parent, name) { }
-    internal BaseFunctionBuilder(INamespaceOrStructureBuilder parent, BaseFunctionBuilder tocopy) : this(parent, tocopy.Name) {}
+
+    internal BaseFunctionBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymous)
+        : base(parent, name, annonymous) { }
     
     
     public int AddParameter(string name, TypeReference typeReference)
     {
-        parameters.Add((name, typeReference));
-        return parameters.Count - 1;
-    }
-    public int AddLocal(TypeReference typeReference)
-    {
-        locals.Add(typeReference);
-        return locals.Count - 1;
+        Parameters.Add((name, typeReference));
+        return Parameters.Count - 1;
     }
     
     public override string ToReadableReference()
@@ -34,7 +26,7 @@ public abstract class BaseFunctionBuilder: ProgramMemberBuilder
         sb.AppendJoin('.', GlobalIdentifier);
         sb.Append('"');
         sb.Append('(');
-        sb.AppendJoin(", ", parameters.Select(e => e.Item2.ToString()));
+        sb.AppendJoin(", ", Parameters.Select(e => e.Item2.ToString()));
         sb.Append(')');
         
         return sb.ToString();

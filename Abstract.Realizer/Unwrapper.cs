@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Abstract.Realizer.Builder.Language.Omega;
 using Abstract.Realizer.Builder.ProgramMembers;
+using Abstract.Realizer.Builder.References;
 using Abstract.Realizer.Core.Intermediate;
 using Abstract.Realizer.Core.Intermediate.Language;
 using Abstract.Realizer.Core.Intermediate.Types;
@@ -36,6 +37,10 @@ internal static class Unwrapper
         var a = instructions.Peek();
         switch (a)
         {
+            case MacroDefineLocal @mdl:
+                instructions.Dequeue();
+                return new IrMacroDefineLocal(mdl.Type);
+            
             case InstStLocal stLocal:
                 instructions.Dequeue();
                 return new IrAssign(new IrLocal(stLocal.index), UnwrapValue(instructions));
@@ -71,20 +76,17 @@ internal static class Unwrapper
         {
             IOmegaRequiresTypePrefix => throw new Exception($"instruction \"{a}\" expects type prefix"),
             
-            InstLdLocal @ldlocal => new IrLocal(ldlocal.local),
-            InstLdNewObject @newobj => new IrNewObj(newobj.type),
+            InstLdLocal @ldlocal => new IrLocal(ldlocal.Local),
+            InstLdNewObject @newobj => new IrNewObj(newobj.Type),
             
             InstLdField @ldField => new IrField(ldField.StaticField),
             InstStField @stField => new IrField(stField.StaticField),
             
-            InstLdConstI1 @ldc1 => new IrInteger(1, ldc1.value ? 1 : 0),
-            InstLdConstI @ldci => new IrInteger(ldci.len, ldci.value),
-            InstLdConstIptr @ldcp => new IrInteger(null, ldcp.value),
+            InstLdConstI1 @ldc1 => new IrInteger(1, ldc1.Value ? 1 : 0),
+            InstLdConstI @ldci => new IrInteger(ldci.Len, ldci.Value),
+            InstLdConstIptr @ldcp => new IrInteger(null, ldcp.Value),
             
-            InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Length)),
-                
-            InstExtend @e => new IrExtend(e.len, UnwrapValue(instructions)),
-            InstTrunc @t => new IrTrunc(t.len, UnwrapValue(instructions)),
+            InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Count)),
 
             IOmegaTypePrefix @tprefix => UnwrapValueTyped(tprefix, instructions),
             
@@ -124,7 +126,10 @@ internal static class Unwrapper
                 UnwrapValue(instructions),
                 UnwrapValue(instructions)),
 
-            _ => throw new Exception("Instruction \"a\" does not allows type prefix"),
+            InstExtend @ext => new IrExtend((IntegerType)typeref, UnwrapValue(instructions)),
+            InstTrunc @tru => new IrTrunc((IntegerType)typeref, UnwrapValue(instructions)),
+            
+            _ => throw new Exception($"Instruction \"{a}\" does not allows type prefix"),
         };
     }
 

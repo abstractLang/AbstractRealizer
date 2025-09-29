@@ -1,6 +1,7 @@
 using System.Numerics;
 using System.Text;
 using Abstract.Realizer.Builder.ProgramMembers;
+using Abstract.Realizer.Builder.References;
 
 namespace Abstract.Realizer.Builder.Language.Beta;
 
@@ -63,10 +64,17 @@ public class BetaBytecodeBuilder : BytecodeBuilder
         public InstructionWriter Div() => AddAndReturn(new InstDiv());
         
         
-        public InstructionWriter Extend(byte size) => AddAndReturn(new InstExtend(size));
-        public InstructionWriter Trunc(byte size) => AddAndReturn(new InstTrunc(size));
+        public InstructionWriter Extend() => AddAndReturn(new InstExtend());
+        public InstructionWriter Trunc() => AddAndReturn(new InstTrunc());
+        
+        
+        public InstructionWriter MStackEnter(StructureBuilder stackFrame) => AddAndReturn(new InstMStackEnter(stackFrame));
+        public InstructionWriter MStackLeave() => AddAndReturn(new InstMStackLeave());
         
         
         public InstructionWriter TypeInt(bool signed, byte? size) => AddAndReturn(new FlagIntTyped(signed, size));
+        
+        
+        public InstructionWriter MacroDefineLocal(TypeReference tref) => AddAndReturn(new MacroDefineLocal(tref));
     }
 }

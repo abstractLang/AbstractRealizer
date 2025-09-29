@@ -4,15 +4,15 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public class ModuleBuilder: NamespaceBuilder
 {
+    public override ModuleBuilder Module => this;
 
     internal ModuleBuilder(string name) : base(null!, name) { }
-    internal ModuleBuilder(ModuleBuilder tocopy) : this(tocopy.Name) { }
     
     public override string ToString()
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"(module \"{Name}\"");
+        sb.AppendLine($"(module \"{Symbol}\"");
         foreach (var i in namespaces) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in structures) sb.AppendLine(i.ToString().TabAllLines());

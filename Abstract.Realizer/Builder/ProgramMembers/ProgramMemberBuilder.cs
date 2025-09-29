@@ -2,17 +2,22 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public abstract class ProgramMemberBuilder
 {
-    public readonly INamespaceOrStructureBuilder? Parent;
-    public readonly string Name;
-
-    public string[] GlobalIdentifier => Parent == null
-        ? [Name]
-        : [..Parent.GlobalIdentifier.Where(e=>!string.IsNullOrEmpty(e)), Name];
+    internal string _symbol;
+    public virtual ModuleBuilder Module => Parent?.Module!;
+    public INamespaceOrStructureBuilder? Parent { get; internal set; }
+    public readonly bool Annonymous;
     
-    internal ProgramMemberBuilder(INamespaceOrStructureBuilder parent, string name)
+    public string Symbol => (Annonymous ? "__annon__" : "") + _symbol;
+    
+    public string[] GlobalIdentifier => Parent == null
+        ? [Symbol]
+        : [..Parent.GlobalIdentifier.Where(e=>!string.IsNullOrEmpty(e)), Symbol];
+    
+    internal ProgramMemberBuilder(INamespaceOrStructureBuilder parent, string symbol, bool annonymous)
     {
         Parent = parent;
-        Name = name;
+        _symbol = symbol;
+        Annonymous = annonymous;
     }
 
     public abstract string ToReadableReference();

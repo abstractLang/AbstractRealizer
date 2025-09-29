@@ -9,5 +9,5 @@ public class NodeTypeReference : TypeReference
     public NodeTypeReference(TypeDefinitionBuilder typedef) => TypeReference = typedef;
     public NodeTypeReference(StructureBuilder structure) => TypeReference = structure;
 
-    public override string ToString() => TypeReference.Name;
+    public override string ToString() => TypeReference.ToReadableReference();
 }

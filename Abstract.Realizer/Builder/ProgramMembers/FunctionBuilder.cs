@@ -1,15 +1,17 @@
 using System.Text;
 using Abstract.Realizer.Builder.Language;
 using Abstract.Realizer.Builder.Language.Omega;
+using Abstract.Realizer.Core.Intermediate.Language;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public class FunctionBuilder: BaseFunctionBuilder
 {
     public BytecodeBuilder? BytecodeBuilder { get; internal set;  }
-  
+    internal IrRoot? _intermediateRoot = null;
     
-    internal FunctionBuilder(INamespaceOrStructureBuilder parent, string name) : base(parent, name) { }
+    internal FunctionBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymous)
+        : base(parent, name, annonymous) { }
     
     
     public OmegaBytecodeBuilder GetOrCreateOmegaBuilder()
@@ -25,12 +27,12 @@ public class FunctionBuilder: BaseFunctionBuilder
     {
         var sb = new StringBuilder();
 
-        sb.Append($"(func \"{Name}\"");
-        foreach (var (name, type) in parameters) sb.Append($" (param \"{name}\" {type})");
-        sb.AppendLine();
-        for (var i = 0; i < locals.Count; i++) sb.AppendLine($"\t(local ${i:d2} {locals[i]})");
-
-        if (BytecodeBuilder != null) sb.Append(BytecodeBuilder.ToString().TabAllLines().TabAllLines());
+        sb.Append($"(func \"{Symbol}\"");
+        foreach (var (name, type) in Parameters) sb.Append($" (param \"{name}\" {type})");
+        
+        if (_intermediateRoot != null) sb.Append($"\n{_intermediateRoot.ToString().TabAllLines()}");
+        else if (BytecodeBuilder != null) sb.Append("\n" + BytecodeBuilder.ToString().TabAllLines());
+        else sb.AppendLine("(no body)");
         
         sb.Length -= Environment.NewLine.Length;
         sb.Append(')');

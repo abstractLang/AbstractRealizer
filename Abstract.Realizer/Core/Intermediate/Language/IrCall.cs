@@ -13,7 +13,7 @@ internal class IrCall(BaseFunctionBuilder f, IrValue[] arguments) : IrValue
         var sb = new StringBuilder();
         
         sb.Append($"(call {Function.ToReadableReference()}");
-        foreach (var i in Arguments) sb.Append($"\n{i}");
+        foreach (var i in Arguments) sb.Append($"\n\t{i}");
         sb.Append(')');
 
         return sb.ToString();

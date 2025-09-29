@@ -1,11 +1,12 @@
 using Abstract.Realizer.Core.Intermediate.Language;
+using Abstract.Realizer.Core.Intermediate.Types;
 
 namespace Abstract.Realizer.Builder.ProgramMembers;
 
-internal class IrTrunc(byte len, IrValue val) : IrValue
+internal class IrTrunc(IntegerType to, IrValue val) : IrValue
 {
-    public readonly byte NewLength = len;
+    public readonly IntegerType ToType = to;
     public readonly IrValue Value = val;
 
-    public override string ToString() => $"(trunc {NewLength} {Value})";
+    public override string ToString() => $"(trunc {ToType} {Value})";
 }

@@ -10,13 +10,14 @@ public class InstanceFieldBuilder: FieldBuilder
     public uint? Alignment { get; set; } = null;
     public uint? Size { get; set; } = null;
     
-    internal InstanceFieldBuilder(INamespaceOrStructureBuilder parent, string name) : base(parent, name) {}
+    internal InstanceFieldBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymous)
+        : base(parent, name, annonymous) {}
 
 
     public override string ToString()
     {
         var sb = new StringBuilder();
-        sb.Append($"(field \"{Name}\"");
+        sb.Append($"(field \"{Symbol}\"");
         
         if (Offset != null) sb.Append($" (offset {Offset.Value})");
         if (Alignment != null) sb.Append($" (alignment {Alignment.Value})");

@@ -1,6 +1,6 @@
 namespace Abstract.Realizer.Core.Configuration.LangOutput;
 
-public struct AlphaOutputConfiguration : ILanguageOutputConfiguration
+public class OmegaOutputConfiguration : ILanguageOutputConfiguration
 {
     public bool BakeGenerics { get; init; }
     public bool UnnestMembers { get; init; }

@@ -10,9 +10,12 @@ namespace Abstract.Realizer.Compiler;
 
 internal static class BetaCompiler
 {
-    public static void CompileFunction(FunctionBuilder function, IrRoot intermediate, BetaOutputConfiguration config)
+    public static void CompileFunction(FunctionBuilder function, BetaOutputConfiguration config)
     {
-        BetaBytecodeBuilder builder = new BetaBytecodeBuilder();
+        var intermediate = function._intermediateRoot!;
+        function._intermediateRoot = null;
+        
+        var builder = new BetaBytecodeBuilder();
         function.BytecodeBuilder = builder;
         CompileRecursive(builder, intermediate, config);
     }
@@ -25,6 +28,11 @@ internal static class BetaCompiler
                 foreach (var n in root.content) CompileRecursive(builder, n, config);
                 break;
 
+            case IrMacroDefineLocal @mdl:
+                builder.Writer.MacroDefineLocal(@mdl.Type);
+                break;
+            
+            
             case IrAssign @assign:
             {
                 CompileRecursive(builder, assign.value, config);
@@ -58,8 +66,7 @@ internal static class BetaCompiler
                     CompileRecursive(builder, i, config);
                 builder.Writer.Call(call.Function);
             } break;
-
-
+            
             case IrBinaryOp @binop:
             {
                 var w = builder.Writer;
@@ -94,8 +101,15 @@ internal static class BetaCompiler
                 
             } break;
             
-            case IrExtend @ext: builder.Writer.Extend(ext.NewLength); break;
-            case IrTrunc @tru: builder.Writer.Trunc(tru.NewLength); break;
+            // FIXME
+            case IrExtend @ext:
+                CompileRecursive(builder, ext.Value, config);
+                builder.Writer.Extend();
+                break;
+            case IrTrunc @tru:
+                CompileRecursive(builder, tru.Value, config);
+                builder.Writer.Trunc();
+                break;
             
             
             case IrRet @ret:

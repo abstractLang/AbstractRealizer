@@ -5,11 +5,11 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 public class NamespaceBuilder: ProgramMemberBuilder, INamespaceOrStructureBuilder
 {
     
-    protected List<NamespaceBuilder> namespaces = [];
-    protected List<StaticFieldBuilder> fields = [];
-    protected List<BaseFunctionBuilder> functions = [];
-    protected List<StructureBuilder> structures = [];
-    protected List<TypeDefinitionBuilder> typedefs = [];
+    internal List<NamespaceBuilder> namespaces = [];
+    internal List<StaticFieldBuilder> fields = [];
+    internal List<BaseFunctionBuilder> functions = [];
+    internal List<StructureBuilder> structures = [];
+    internal List<TypeDefinitionBuilder> typedefs = [];
 
     public NamespaceBuilder[] Namespaces => [..namespaces];
     public StaticFieldBuilder[] Fields => [..fields]; 
@@ -17,44 +17,66 @@ public class NamespaceBuilder: ProgramMemberBuilder, INamespaceOrStructureBuilde
     public StructureBuilder[] Structures => [..structures];
     public TypeDefinitionBuilder[] TypeDefinitions => [..typedefs];
     
-    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, string name) : base(null!, name) { }
- 
+    internal NamespaceBuilder(INamespaceOrStructureBuilder parent, string name)
+        : base(null!, name, false) { }
     
-    public NamespaceBuilder AddNamespace(string ns)
+    public NamespaceBuilder AddNamespace(string symbol)
     {
-        var newNamespace = new NamespaceBuilder(this, ns);
+        var newNamespace = new NamespaceBuilder(this, symbol);
         namespaces.Add(newNamespace);
         return newNamespace;
     }
-    public FunctionBuilder AddFunction(string fn)
+    public FunctionBuilder AddFunction(string symbol)
     {
-        var newFunction = new FunctionBuilder(this, fn);
+        var newFunction = new FunctionBuilder(this, symbol, false);
         functions.Add(newFunction);
         return newFunction;
     }
+    public StructureBuilder AddStructure(string symbol)
+    {
+        var newStructure = new StructureBuilder(this, symbol, false);
+        structures.Add(newStructure);
+        return newStructure;
+    }
+    public TypeDefinitionBuilder AddTypedef(string symbol)
+    {
+        var newTypedef = new TypeDefinitionBuilder(this, symbol, false);
+        typedefs.Add(newTypedef);
+        return newTypedef;
+    }
+    public StaticFieldBuilder AddStaticField(string symbol)
+    {
+        var newField = new StaticFieldBuilder(this, symbol, false);
+        fields.Add(newField);
+        return newField;
+    }
+
+
+    public FunctionBuilder AddAnnonymousFunction(string symbol)
+    {
+        var newFunction = new FunctionBuilder(this, symbol, true);
+        functions.Add(newFunction);
+        return newFunction;
+    }
+    public StructureBuilder AddAnnonymousStructure(string symbol)
+    {
+        var newStructure = new StructureBuilder(this, symbol, true);
+        structures.Add(newStructure);
+        return newStructure;
+    }
+    public TypeDefinitionBuilder AddAnnonymousTypedef(string symbol)
+    {
+        var newTypedef = new TypeDefinitionBuilder(this, symbol, true);
+        typedefs.Add(newTypedef);
+        return newTypedef;
+    }
+    
+    
     public ImportedFunctionBuilder AddExternImportedFunction(string fn)
     {
         var newFunction = new ImportedFunctionBuilder(this, fn);
         functions.Add(newFunction);
         return newFunction;
-    }
-    public StructureBuilder AddStructure(string st)
-    {
-        var newStructure = new StructureBuilder(this, st);
-        structures.Add(newStructure);
-        return newStructure;
-    }
-    public TypeDefinitionBuilder AddTypedef(string td)
-    {
-        var newTypedef = new TypeDefinitionBuilder(this, td);
-        typedefs.Add(newTypedef);
-        return newTypedef;
-    }
-    public StaticFieldBuilder AddStaticField(string fn)
-    {
-        var newField = new StaticFieldBuilder(this, fn);
-        fields.Add(newField);
-        return newField;
     }
     
     
@@ -62,7 +84,7 @@ public class NamespaceBuilder: ProgramMemberBuilder, INamespaceOrStructureBuilde
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"(namespace \"{Name}\"");
+        sb.AppendLine($"(namespace \"{Symbol}\"");
         foreach (var i in namespaces) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in fields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());

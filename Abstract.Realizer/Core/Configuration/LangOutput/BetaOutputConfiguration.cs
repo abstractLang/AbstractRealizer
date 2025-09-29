@@ -1,21 +1,26 @@
 namespace Abstract.Realizer.Core.Configuration.LangOutput;
 
-public class BetaOutputConfiguration : ILanguageOutputConfiguration
+public struct BetaOutputConfiguration : ILanguageOutputConfiguration
 {
-    public bool BakeGenerics { get; set; }
-    public byte MemoryUnit { get; set; }
+    public bool BakeGenerics { get; init; }
+    public bool UnnestMembers { get; init; }
     
-    public BetaExtendableInstructionSet EnabledOpcodes { get; set; } = BetaExtendableInstructionSet.None;
-    public BetaExtendableScopes EnabledScopes { get; set; } = BetaExtendableScopes.None;
-    
-    public BetaSizedOperationsOptions SizedOperations { get; set; } =  BetaSizedOperationsOptions.None;
+    public byte MemoryUnit { get; init; }
+    public byte IptrSize { get; init; }
+
+    public BetaExtendableInstructionSet EnabledOpcodes { get; init; }
+    public BetaExtendableScopes EnabledScopes { get; init; }
+    public BetaSizedOperationsOptions SizedOperations { get; init; }
+    public BetaDataKinds LocalStores { get; init; }
+    public bool UseMemoryStack { get; init; }
 }
 
 [Flags]
 public enum BetaExtendableInstructionSet
 {
         None = 0,
-        All = int.MaxValue,
+        All = None
+            | Dup | Swap | NewObj,
             
         Dup = (1 << 0),
         Swap = (1 << 1),
@@ -38,7 +43,11 @@ public enum BetaExtendableScopes
 public enum BetaSizedOperationsOptions
 {
     None = 0,
-    All = int.MaxValue,
+    All = None
+            | IntegerSigness
+            | IntegerSize
+            | FloatingSize
+            | Object,
     
     IntegerSigness = (1 << 0),
     IntegerSize = (1 << 1),
@@ -46,4 +55,16 @@ public enum BetaSizedOperationsOptions
     FloatingSize = (1 << 2),
     
     Object = (1 << 3),
+}
+
+[Flags]
+public enum BetaDataKinds: byte
+{
+    None = 0,
+    All = None
+          | Primitives
+          | Objects,
+    
+    Primitives = (1 << 0),
+    Objects = (1 << 1),
 }

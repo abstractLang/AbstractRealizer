@@ -2,6 +2,10 @@ namespace Abstract.Realizer.Core.Configuration.LangOutput;
 
 public interface ILanguageOutputConfiguration
 {
-    public bool BakeGenerics { get; set; }
-    public byte MemoryUnit { get; set; }
+    public bool BakeGenerics { get; init; }
+    public bool UnnestMembers { get; init; }
+    
+    
+    public byte MemoryUnit { get; init; }
+    public byte IptrSize { get; init; }
 }

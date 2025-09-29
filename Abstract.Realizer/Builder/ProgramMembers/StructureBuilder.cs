@@ -12,18 +12,32 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
     public uint? Alignment = null;
     
     
-    internal StructureBuilder(INamespaceOrStructureBuilder parent, string name): base(parent, name) {}
+    internal StructureBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymouns)
+        : base(parent, name, annonymouns) {}
     
     
-    public InstanceFieldBuilder AddField(string fn)
+    public InstanceFieldBuilder AddField(string symbol)
     {
-        var newField = new InstanceFieldBuilder(this, fn);
+        var newField = new InstanceFieldBuilder(this, symbol, false);
         Fields.Add(newField);
         return newField;
     }
-    public FunctionBuilder AddFunction(string fn)
+    public FunctionBuilder AddFunction(string symbol)
     {
-        var newFunction = new FunctionBuilder(this, fn);
+        var newFunction = new FunctionBuilder(this, symbol, false);
+        Functions.Add(newFunction);
+        return newFunction;
+    }
+    
+    public InstanceFieldBuilder AddAnnonymousField(string symbol)
+    {
+        var newField = new InstanceFieldBuilder(this, symbol, true);
+        Fields.Add(newField);
+        return newField;
+    }
+    public FunctionBuilder AddAnnonymousFunction(string symbol)
+    {
+        var newFunction = new FunctionBuilder(this, symbol, true);
         Functions.Add(newFunction);
         return newFunction;
     }
@@ -33,7 +47,7 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"(struct \"{Name}\"");
+        sb.AppendLine($"(struct \"{Symbol}\"");
         
         if (Length != null || Alignment != null) sb.Append('\t');
         if (Length != null) sb.Append($"(length {Length}) ");
