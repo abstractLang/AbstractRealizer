@@ -221,6 +221,11 @@ public readonly struct InstStIndex : IOmegaInstruction
 {
     public override string ToString() => $"ld.index";
 }
+
+public readonly struct InstConv() : IOmegaInstruction, IOmegaRequiresTypePrefix
+{
+    public override string ToString() => "conv";
+}
 public readonly struct InstExtend() : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public override string ToString() => "extend";
@@ -229,7 +234,7 @@ public readonly struct InstTrunc(u8 len) : IOmegaInstruction, IOmegaRequiresType
 {
     public override string ToString() => $"trunc";
 }
-public readonly struct InstSigcast(bool signed) : IOmegaInstruction
+public readonly struct InstSigcast(bool signed) : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
     public readonly bool Signed = signed;
     public override string ToString() => $"sigcast." + (Signed ? 's' : 'u');

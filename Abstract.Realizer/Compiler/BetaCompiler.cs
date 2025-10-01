@@ -91,11 +91,17 @@ internal static class BetaCompiler
                 }
                 switch (binop.Op)
                 {
-                    case BinaryOperation.add: w.Add(); break;
-                    case BinaryOperation.sub: w.Sub(); break;
-                    case BinaryOperation.mul: w.Mul(); break;
-                    case BinaryOperation.div: w.Div(); break;
-                    case BinaryOperation.rem: throw new NotImplementedException(); break;
+                    case BinaryOperation.Add: w.Add(); break;
+                    case BinaryOperation.Sub: w.Sub(); break;
+                    case BinaryOperation.Mul: w.Mul(); break;
+                    case BinaryOperation.Div: w.Div(); break;
+                    
+                    case BinaryOperation.Rem:
+                    case BinaryOperation.BitAnd:
+                    case BinaryOperation.BitOr:
+                    case BinaryOperation.BitXor:
+                        throw new NotImplementedException();
+                        
                     default: throw new ArgumentOutOfRangeException();
                 }
                 

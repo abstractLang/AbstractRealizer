@@ -2,9 +2,13 @@ namespace Abstract.Realizer.Core.Intermediate;
 
 public enum BinaryOperation
 {
-    add,
-    sub,
-    mul,
-    div,
-    rem,
+    Add,
+    Sub,
+    Mul,
+    Div,
+    Rem,
+    
+    BitAnd,
+    BitOr,
+    BitXor,
 }

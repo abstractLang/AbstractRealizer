@@ -114,20 +114,29 @@ internal static class Unwrapper
         var a = instructions.Dequeue();
         return a switch
         {
-            InstAdd => new IrBinaryOp(typeref, BinaryOperation.add,
-                UnwrapValue(instructions),
-                UnwrapValue(instructions)),
+            InstAdd => new IrBinaryOp(typeref, BinaryOperation.Add,
+                UnwrapValue(instructions), UnwrapValue(instructions)),
 
-            InstSub => new IrBinaryOp(typeref, BinaryOperation.sub,
-                UnwrapValue(instructions),
-                UnwrapValue(instructions)),
+            InstSub => new IrBinaryOp(typeref, BinaryOperation.Sub,
+                UnwrapValue(instructions), UnwrapValue(instructions)),
 
-            InstMul => new IrBinaryOp(typeref, BinaryOperation.mul,
-                UnwrapValue(instructions),
-                UnwrapValue(instructions)),
+            InstMul => new IrBinaryOp(typeref, BinaryOperation.Mul,
+                UnwrapValue(instructions), UnwrapValue(instructions)),
 
-            InstExtend @ext => new IrExtend((IntegerType)typeref, UnwrapValue(instructions)),
-            InstTrunc @tru => new IrTrunc((IntegerType)typeref, UnwrapValue(instructions)),
+            
+            InstAnd => new IrBinaryOp(typeref, BinaryOperation.BitAnd,
+                UnwrapValue(instructions), UnwrapValue(instructions)),
+            
+            InstOr => new IrBinaryOp(typeref, BinaryOperation.BitOr,
+                UnwrapValue(instructions), UnwrapValue(instructions)),
+            
+            InstXor => new IrBinaryOp(typeref, BinaryOperation.BitXor,
+                UnwrapValue(instructions), UnwrapValue(instructions)),
+            
+            
+            InstConv => new IrConv(typeref, UnwrapValue(instructions)),
+            InstExtend => new IrExtend((IntegerType)typeref, UnwrapValue(instructions)),
+            InstTrunc => new IrTrunc((IntegerType)typeref, UnwrapValue(instructions)),
             
             _ => throw new Exception($"Instruction \"{a}\" does not allows type prefix"),
         };

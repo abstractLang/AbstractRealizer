@@ -101,10 +101,21 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             case InstMul: sb.Append($"mul" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstAnd: sb.Append($"AND" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstOr: sb.Append($"OR" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstXor: sb.Append($"XOR" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            
             
             case InstSigcast @s: sb.Append("(sigcast." + (s.Signed ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
             case InstTrunc @t: sb.Append($"trunc {WriteInstructionValue(instQueue)})"); break;
             case InstExtend @e: sb.Append($"extend {WriteInstructionValue(instQueue)})"); break;
+            case InstConv @c: sb.Append($"conv {WriteInstructionValue(instQueue)}"); break;
             
             case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.Len} 0x{ldconsti.Value:x})"); break;
             case InstLdConstI1 @ldc: sb.Append("(const 1 " + (ldc.Value ? "true" : "false" + ")")); break;
@@ -219,6 +230,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter StField(InstanceFieldBuilder r) => AddAndReturn(new InstStField(r));
         public InstructionWriter StIndex() => AddAndReturn(new InstStIndex());
         
+        public InstructionWriter Conv() => AddAndReturn(new InstConv());
         public InstructionWriter Extend() => AddAndReturn(new InstExtend());
         public InstructionWriter Trunc() => AddAndReturn(new InstTrunc());
         public InstructionWriter Sigcast(bool signess) => AddAndReturn(new InstSigcast(signess));

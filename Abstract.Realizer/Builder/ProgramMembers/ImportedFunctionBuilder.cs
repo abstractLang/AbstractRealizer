@@ -21,7 +21,7 @@ public class ImportedFunctionBuilder: BaseFunctionBuilder
         foreach (var (name, type) in Parameters) sb.Append($" (param \"{name}\" {type})");
 
         if (ImportDomain != null && ImportSymbol != null) sb.Append($" (import \"{ImportDomain}\" \"{ImportSymbol}\"");
-        if (ImportSymbol != null) sb.Append($" (import \"{ImportSymbol}\")");
+        else if (ImportSymbol != null) sb.Append($" (import \"{ImportSymbol}\")");
         else sb.Append($" (import nullptr)");
         sb.Append(')');
         
