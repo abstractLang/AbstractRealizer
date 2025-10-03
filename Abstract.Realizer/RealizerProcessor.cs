@@ -65,6 +65,7 @@ public class RealizerProcessor
                     if (function.BytecodeBuilder is BetaBytecodeBuilder) continue;
                     BetaCompiler.CompileFunction(function, (BetaOutputConfiguration)configuration);
                     break;
+                
             }
         }
 
