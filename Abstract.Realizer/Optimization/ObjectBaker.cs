@@ -43,12 +43,12 @@ public static class ObjectBaker
                 switch (j.Type)
                 {
                     case IntegerTypeReference @it:
-                        var intAlig = (it.Bits ?? configuration.IptrSize).AlignForward(configuration.MemoryUnit);
+                        var intAlig = (it.Bits ?? configuration.NativeIntegerSize).AlignForward(configuration.MemoryUnit);
                         
                         j.Size = it.Bits;
                         j.Alignment = (uint)intAlig;
                         
-                        size += it.Bits ?? configuration.IptrSize;
+                        size += it.Bits ?? configuration.NativeIntegerSize;
                         minAlig = Math.Max(minAlig, intAlig);
                         break;
                     

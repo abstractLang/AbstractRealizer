@@ -6,5 +6,5 @@ public class OmegaOutputConfiguration : ILanguageOutputConfiguration
     public bool UnnestMembers { get; init; }
     
     public byte MemoryUnit { get; init; }
-    public byte IptrSize { get; init; }
+    public byte NativeIntegerSize { get; init; }
 }

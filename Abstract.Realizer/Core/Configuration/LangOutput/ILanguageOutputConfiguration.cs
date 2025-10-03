@@ -7,5 +7,5 @@ public interface ILanguageOutputConfiguration
     
     
     public byte MemoryUnit { get; init; }
-    public byte IptrSize { get; init; }
+    public byte NativeIntegerSize { get; init; }
 }

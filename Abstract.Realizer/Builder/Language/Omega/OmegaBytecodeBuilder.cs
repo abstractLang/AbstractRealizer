@@ -120,7 +120,11 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.Len} 0x{ldconsti.Value:x})"); break;
             case InstLdConstI1 @ldc: sb.Append("(const 1 " + (ldc.Value ? "true" : "false" + ")")); break;
             case InstLdConstIptr @ldc: sb.Append($"(const ptr 0x{ldc.Value:x})"); break;
-
+            
+            case InstLdSlicePtr @sliceptr: sb.Append($"(slice.ptr 0x{sliceptr.Pointer:x} {sliceptr.Length})"); break;
+            case InstLdSlice @slice: sb.Append($"(slice [{slice.Content}])"); break;
+            case InstLdStringUtf8 @str: sb.Append($"(string \"{str.Value}\""); break;
+            
             case InstLdLocal @ldl:
                 if (ldl.Local < 0) sb.Append($"(arg {(-ldl.Local)-1})");
                 else sb.Append($"(local {ldl.Local})");
@@ -212,6 +216,9 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdConstNull() => AddAndReturn(new InstLdConstNull());
         
         public InstructionWriter LdNewSlice() => AddAndReturn(new InstLdNewSlice());
+        public InstructionWriter LdSlicePtr(uint ptr, uint len) => AddAndReturn(new InstLdSlicePtr(ptr, len));
+        public InstructionWriter LdSlice(byte[] data) => AddAndReturn(new InstLdSlice(data));
+        public InstructionWriter LdStringUtf8(string val) => AddAndReturn(new InstLdStringUtf8(val));
         public InstructionWriter LdNewObject(TypeBuilder r) => AddAndReturn(new InstLdNewObject(r));
         
         public InstructionWriter LdLocal(short index) => AddAndReturn(new InstLdLocal(index));

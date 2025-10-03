@@ -6,7 +6,7 @@ public struct BetaOutputConfiguration : ILanguageOutputConfiguration
     public bool UnnestMembers { get; init; }
     
     public byte MemoryUnit { get; init; }
-    public byte IptrSize { get; init; }
+    public byte NativeIntegerSize { get; init; }
 
     public BetaExtendableInstructionSet EnabledOpcodes { get; init; }
     public BetaExtendableScopes EnabledScopes { get; init; }

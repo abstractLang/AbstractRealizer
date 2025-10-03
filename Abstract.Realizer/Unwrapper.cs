@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using Abstract.Realizer.Builder.Language.Omega;
 using Abstract.Realizer.Builder.ProgramMembers;
 using Abstract.Realizer.Builder.References;
@@ -85,6 +86,8 @@ internal static class Unwrapper
             InstLdConstI1 @ldc1 => new IrInteger(1, ldc1.Value ? 1 : 0),
             InstLdConstI @ldci => new IrInteger(ldci.Len, ldci.Value),
             InstLdConstIptr @ldcp => new IrInteger(null, ldcp.Value),
+            
+            InstLdStringUtf8 @str => new IrSliceBytes(Encoding.UTF8.GetBytes(str.Value)),
             
             InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Count)),
 

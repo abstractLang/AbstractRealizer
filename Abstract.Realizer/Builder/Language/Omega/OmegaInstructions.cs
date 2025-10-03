@@ -145,6 +145,26 @@ public readonly struct InstLdNewSlice : IOmegaInstruction
 {
     public override string ToString() => "ld.new.slice";
 }
+public readonly struct InstLdSlicePtr(uint ptr, uint len) : IOmegaInstruction
+{
+    public readonly uint Pointer = ptr;
+    public readonly uint Length = len;
+    public override string ToString() => $"ld.slice ptr [0x{Pointer:x}..0x{Pointer + Length:x}]";
+}
+public readonly struct InstLdSlice(byte[] bytes) : IOmegaInstruction
+{
+    public readonly byte[] Content = bytes;
+    public override string ToString() => $"ld.slice [{string.Concat(Content.Select( e => $"{e:x2}"))}]";
+}
+public readonly struct InstLdStringUtf8(string value) : IOmegaInstruction
+{
+    public readonly string Value = value;
+    public override string ToString() => $"ld.string Utf8 \"{value
+            .Replace("\a", "\\a").Replace("\b", "\\b")
+            .Replace("\f", "\\f").Replace("\n", "\\n")
+            .Replace("\r", "\\r").Replace("\t", "\\t")
+            .Replace("\v", "\\v").Replace("\0", "\\0")}\"";
+}
 public readonly struct InstLdNewObject(TypeBuilder r) : IOmegaInstruction
 {
     public readonly TypeBuilder Type = r;
