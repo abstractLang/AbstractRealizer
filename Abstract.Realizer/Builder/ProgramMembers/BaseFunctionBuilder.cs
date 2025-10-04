@@ -6,7 +6,7 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 public abstract class BaseFunctionBuilder: ProgramMemberBuilder
 {
     public List<(string name, TypeReference type)> Parameters = [];
-    
+    public TypeReference? ReturnType = null;
 
     internal BaseFunctionBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymous)
         : base(parent, name, annonymous) { }
