@@ -104,7 +104,7 @@ public class RealizerProcessor
     
     private void UnwrapRecursive(ProgramBuilder program)
     {
-        UnwrapRecursive(program.GetRoot());
+        foreach (var module in program.Modules) UnwrapRecursive(module);
     }
     private void UnwrapRecursive(ProgramMemberBuilder member)
     {

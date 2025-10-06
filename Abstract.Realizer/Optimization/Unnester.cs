@@ -10,7 +10,7 @@ internal static class Unnester
     {
         Dictionary<ModuleBuilder, ModuleContent> moduleMembers = [];
         
-        ModuleBuilder[] modules = [builder.GetRoot()!];
+        ModuleBuilder[] modules = builder.Modules;
         foreach (var module in modules)
         {
             var mc = new ModuleContent();

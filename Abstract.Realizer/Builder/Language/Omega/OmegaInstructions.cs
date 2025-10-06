@@ -181,9 +181,10 @@ public readonly struct InstLdLocal(i16 index) : IOmegaInstruction
 }
 public readonly struct InstLdLocalRef(i16 index) : IOmegaInstruction
 {
-    public override string ToString() => index < 0
-            ? $"ld.arg.ref {-index - 1}"
-            : $"ld.local.ref ${index}";
+    public readonly i16 Local = index;
+    public override string ToString() => Local < 0
+            ? $"ld.arg.ref ${-Local - 1}"
+            : $"ld.local.ref ${Local}";
 }
 public readonly struct InstLdStaticField(StaticFieldBuilder r) : IOmegaInstruction
 {
@@ -226,6 +227,13 @@ public readonly struct InstStLocal(i16 index) : IOmegaInstruction
             : index < 0 ?
                 $"st.arg.{-index - 1}"
                 : $"st.local ${index}";
+}
+public readonly struct InstStLocalRef(i16 index) : IOmegaInstruction
+{
+    public readonly i16 index = index;
+    public override string ToString() => index < 0
+                ? $"st.arg.ref ${-index - 1}"
+                : $"st.local.ref ${index}";
 }
 public readonly struct InstStStaticField(StaticFieldBuilder f) : IOmegaInstruction
 {

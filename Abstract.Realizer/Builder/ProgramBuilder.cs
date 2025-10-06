@@ -5,23 +5,17 @@ namespace Abstract.Realizer.Builder;
 public class ProgramBuilder()
 {
 
-    private ModuleBuilder? _root = null;
+    private List<ModuleBuilder> _modules = [];
+    public ModuleBuilder[] Modules => [.. _modules];
     
-    internal void AddModule(ModuleBuilder module)
-    {
-        _root = module;
-    }
-
-    
-    public ModuleBuilder? GetRoot() => _root;
-
+    internal void AddModule(ModuleBuilder module) => _modules.Add(module);
     public ModuleBuilder AddModule(string name)
     {
-        _root = new ModuleBuilder(name);
-        return _root;
+        var newmod = new ModuleBuilder(name);
+        _modules.Add(newmod);
+        return newmod;
     }
-    
-    public override string ToString() => _root?.ToString() ?? "";
 
-    
+    public override string ToString() => string.Join("\n", _modules);
+
 }

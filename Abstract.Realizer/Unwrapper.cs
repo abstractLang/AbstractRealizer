@@ -80,6 +80,8 @@ internal static class Unwrapper
             InstLdLocal @ldlocal => new IrLocal(ldlocal.Local),
             InstLdNewObject @newobj => new IrNewObj(newobj.Type),
             
+            InstLdLocalRef @ldlocalref => new IrRefOf(new IrLocal(ldlocalref.Local)),
+            
             InstLdField @ldField => new IrField(ldField.StaticField),
             InstStField @stField => new IrField(stField.StaticField),
             

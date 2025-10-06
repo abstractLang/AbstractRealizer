@@ -65,6 +65,13 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 else sb.Append($"(local {stlocal.index}) = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
+            case InstStLocalRef @stlocref:
+            {
+                instQueue.Dequeue();
+                if (stlocref.index < 0) sb.Append($"(arg ${(-stlocref.index) - 1})* = ");
+                else sb.Append($"(local {stlocref.index})* = ");
+                sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
+            } break;
             
             case InstStStaticField @stfld:
             {
@@ -72,7 +79,6 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 sb.Append($"(field {stfld.StaticField.ToReadableReference()}) = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
-            
             case InstStField @stfld:
             {
                 instQueue.Dequeue();
@@ -128,6 +134,10 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             case InstLdLocal @ldl:
                 if (ldl.Local < 0) sb.Append($"(arg {(-ldl.Local)-1})");
                 else sb.Append($"(local {ldl.Local})");
+                break;
+            case InstLdLocalRef @ldr:
+                if (ldr.Local < 0) sb.Append($"(arg.ref {(-ldr.Local)-1})");
+                else sb.Append($"(local.ref {ldr.Local})");
                 break;
             case InstLdStaticField @ldf: sb.Append($"(field {ldf.StaticField.ToReadableReference()})"); break;
             case InstLdField @acf: sb.Append($"(field {acf.StaticField.ToReadableReference()})"); break;
@@ -233,6 +243,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdIndex() => AddAndReturn(new InstLdIndex());
         
         public InstructionWriter StLocal(short index) => AddAndReturn(new InstStLocal(index));
+        public InstructionWriter StLocalRef(short index) => AddAndReturn(new InstStLocalRef(index));
         public InstructionWriter StField(StaticFieldBuilder r) => AddAndReturn(new InstStStaticField(r));
         public InstructionWriter StField(InstanceFieldBuilder r) => AddAndReturn(new InstStField(r));
         public InstructionWriter StIndex() => AddAndReturn(new InstStIndex());
