@@ -7,11 +7,13 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public class FunctionBuilder: BaseFunctionBuilder
 {
+    public string? ExportSymbol = null;
+    
     public BytecodeBuilder? BytecodeBuilder { get; internal set;  }
     internal IrRoot? _intermediateRoot = null;
-    
+
     internal FunctionBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymous)
-        : base(parent, name, annonymous) { }
+        : base(parent, name, annonymous) {}
     
     
     public OmegaBytecodeBuilder GetOrCreateOmegaBuilder()
