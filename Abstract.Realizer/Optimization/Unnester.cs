@@ -47,6 +47,15 @@ internal static class Unnester
             module.structures.Clear();
             module.structures = content.structs;
             
+            foreach (var member in content.typedefs)
+            {
+                var global = string.Join('.', member.Parent!.GlobalIdentifier);
+                member._symbol = global + '.' + member._symbol;
+                member.Parent = module;
+            }
+            module.typedefs.Clear();
+            module.typedefs = content.typedefs;
+            
             module.namespaces.Clear();
         }
     }
@@ -68,6 +77,11 @@ internal static class Unnester
                 content.structs.Add(struc);
                 break;
             
+            case TypeDefinitionBuilder @typedef:
+                content.typedefs.Add(typedef);
+                //TODO Typedef functions
+                break;
+            
             case BaseFunctionBuilder @func: content.functions.Add(func); break;
             case StaticFieldBuilder @field: content.fields.Add(field); break;
             
@@ -80,5 +94,6 @@ internal static class Unnester
         public List<StaticFieldBuilder> fields = [];
         public List<BaseFunctionBuilder> functions = [];
         public List<StructureBuilder> structs = [];
+        public List<TypeDefinitionBuilder> typedefs = [];
     }
 }

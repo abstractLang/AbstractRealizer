@@ -128,6 +128,11 @@ public class RealizerProcessor
                 foreach (var f in s.Functions) UnwrapRecursive(f);
                 break;
             
+            case TypeDefinitionBuilder @t:
+                typedefs.Add(@t);
+                //TODO
+                break;
+            
             case StaticFieldBuilder @f: 
                 fields.Add(f);
                 break;

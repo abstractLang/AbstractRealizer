@@ -34,8 +34,15 @@ public static class ObjectBaker
         for (var i = 0; i < toiter.Count; i++)
         {
             var cur = toiter[i];
-            uint minAlig = 0;
-            uint size = 0;
+            uint minAlig = configuration.NativeIntegerSize; // Type table ptr
+            uint size = configuration.NativeIntegerSize;
+            
+            if (cur.Extends != null)
+            {
+                if (!baked.TryGetValue(cur.Extends, out var shit)) goto hardbreak;
+                minAlig = Math.Max(minAlig, cur.Extends.Alignment!.Value);;
+                size += cur.Extends.Length!.Value;
+            }
             
             foreach (var j in cur.Fields)
             {
@@ -45,11 +52,8 @@ public static class ObjectBaker
                     case IntegerTypeReference @it:
                         var intAlig = (it.Bits ?? configuration.NativeIntegerSize).AlignForward(configuration.MemoryUnit);
                         
-                        j.Size = it.Bits;
-                        j.Alignment = (uint)intAlig;
-                        
-                        size += it.Bits ?? configuration.NativeIntegerSize;
-                        minAlig = Math.Max(minAlig, intAlig);
+                        j.Size = it.Bits ?? configuration.NativeIntegerSize;
+                        j.Alignment = intAlig;
                         break;
                     
                     case NodeTypeReference @nt:
@@ -60,18 +64,24 @@ public static class ObjectBaker
                                 
                                 j.Size = struc.Length;
                                 j.Alignment = struc.Alignment;
-                                
-                                minAlig = Math.Max(minAlig, shit.a);
-                                size += shit.s;
                                 break;
                             
                             case TypeDefinitionBuilder @typedef:
+                                j.Size = configuration.NativeIntegerSize;
+                                j.Alignment = configuration.NativeIntegerSize;
                                 break;
                         }
                         break;
                     
+                    case ReferenceTypeReference:
+                        j.Size = configuration.NativeIntegerSize;
+                        j.Alignment = configuration.NativeIntegerSize;
+                        break;
+                    
                     default: throw new UnreachableException();
                 }
+                size += j.Size!.Value;
+                minAlig = Math.Max(minAlig, j.Alignment!.Value);
             }
 
             cur.Alignment = minAlig;

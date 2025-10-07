@@ -4,10 +4,10 @@ namespace Abstract.Realizer.Builder.ProgramMembers;
 
 public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
 {
+    public StructureBuilder? Extends = null;
     public List<InstanceFieldBuilder> Fields = [];
     public List<BaseFunctionBuilder> Functions = [];
-
-
+    
     public uint? Length = null;
     public uint? Alignment = null;
     
@@ -47,7 +47,9 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
     {
         var sb = new StringBuilder();
 
-        sb.AppendLine($"(struct \"{Symbol}\"");
+        sb.Append($"(struct \"{Symbol}\"");
+        if (Extends != null) sb.Append($" (extends {Extends.ToReadableReference()}");
+        sb.AppendLine();
         
         if (Length != null || Alignment != null) sb.Append('\t');
         if (Length != null) sb.Append($"(length {Length}) ");

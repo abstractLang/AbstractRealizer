@@ -20,7 +20,7 @@ public class ImportedFunctionBuilder: BaseFunctionBuilder
         sb.Append($"(func \"{Symbol}\"");
         foreach (var (name, type) in Parameters) sb.Append($" (param \"{name}\" {type})");
 
-        if (ImportDomain != null && ImportSymbol != null) sb.Append($" (import \"{ImportDomain}\" \"{ImportSymbol}\"");
+        if (ImportDomain != null && ImportSymbol != null) sb.Append($" (import \"{ImportDomain}\" \"{ImportSymbol}\")");
         else if (ImportSymbol != null) sb.Append($" (import \"{ImportSymbol}\")");
         else sb.Append($" (import nullptr)");
         sb.Append(')');
