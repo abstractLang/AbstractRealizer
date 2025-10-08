@@ -73,7 +73,7 @@ internal static class Unnester
                 break;
             
             case StructureBuilder @struc:
-                foreach (var functions in struc.Functions) SelectMembersRecursive(functions, content);
+                //foreach (var functions in struc.Functions) SelectMembersRecursive(functions, content);
                 content.structs.Add(struc);
                 break;
             

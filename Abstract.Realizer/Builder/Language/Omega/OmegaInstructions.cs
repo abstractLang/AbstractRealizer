@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using Abstract.Realizer.Builder.ProgramMembers;
 using Abstract.Realizer.Builder.References;
@@ -18,6 +19,15 @@ public interface IOmegaFlag: IOmegaInstruction { }
 public interface IOmegaMacro: IOmegaInstruction { }
 public interface IOmegaTypePrefix { }
 public interface IOmegaRequiresTypePrefix { }
+
+public enum OmegaMetadataKind : u8
+{
+    StructureName,
+    StructureSize,
+    StructureAlign,
+    
+    FunctionName,
+}
 
 
 public readonly struct InstNop : IOmegaInstruction
@@ -165,9 +175,9 @@ public readonly struct InstLdStringUtf8(string value) : IOmegaInstruction
             .Replace("\r", "\\r").Replace("\t", "\\t")
             .Replace("\v", "\\v").Replace("\0", "\\0")}\"";
 }
-public readonly struct InstLdNewObject(TypeBuilder r) : IOmegaInstruction
+public readonly struct InstLdNewObject(StructureBuilder r) : IOmegaInstruction
 {
-    public readonly TypeBuilder Type = r;
+    public readonly StructureBuilder Type = r;
     public override string ToString() => $"ld.new.obj {Type.ToReadableReference()}";
 }
 public readonly struct InstLdLocal(i16 index) : IOmegaInstruction
@@ -205,6 +215,10 @@ public readonly struct InstLdFieldRef(StaticFieldBuilder r) : IOmegaInstruction
     public readonly StaticFieldBuilder StaticField = r;
     public override string ToString() => $"ld.field.ref";
 }
+public readonly struct InstLdIndex : IOmegaInstruction
+{
+    public override string ToString() => $"ld.index";
+}
 public readonly struct InstLdFuncRef(FunctionBuilder r) : IOmegaInstruction
 {
     public override string ToString() => $"ld.func.ref {r.ToReadableReference()}";
@@ -213,11 +227,24 @@ public readonly struct InstLdTypeRef(TypeBuilder r) : IOmegaInstruction
 {
     public override string ToString() => $"ld.type.ref {r.ToReadableReference()}";
 }
-public readonly struct InstLdIndex : IOmegaInstruction
+public readonly struct InstLdTypeRefOf() : IOmegaInstruction
 {
-    public override string ToString() => $"ld.index";
+    public override string ToString() => $"ld.type.ref.of";
 }
 
+public readonly struct InstLdMeta(OmegaMetadataKind kind) : IOmegaInstruction
+{
+    public readonly OmegaMetadataKind Kind = kind;
+    public override string ToString() => $"ld.meta {Kind switch {
+        OmegaMetadataKind.FunctionName => "function.name",
+        
+        OmegaMetadataKind.StructureName => "struct.name",
+        OmegaMetadataKind.StructureAlign => "struct.align",
+        OmegaMetadataKind.StructureSize => "struct.size",
+        
+        _ => throw new UnreachableException()
+    }}";
+}
 
 public readonly struct InstStLocal(i16 index) : IOmegaInstruction
 {

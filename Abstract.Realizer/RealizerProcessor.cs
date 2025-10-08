@@ -138,6 +138,7 @@ public class RealizerProcessor
                 break;
             
             case ImportedFunctionBuilder: break;
+            case AbstractFunctionBuilder: break;
             
             default: throw new NotImplementedException();
         }

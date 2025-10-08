@@ -24,11 +24,7 @@ internal static class Unwrapper
             _ => throw new ArgumentException("function do not has a valid input bytecode!")
         };
 
-        while (queue.Count > 0)
-        {
-            root.content.Add(UnwrapInstruction(queue));
-            
-        }
+        while (queue.Count > 0) root.content.Add(UnwrapInstruction(queue));
             
         return root;
     }
@@ -81,6 +77,8 @@ internal static class Unwrapper
             InstLdNewObject @newobj => new IrNewObj(newobj.Type),
             
             InstLdLocalRef @ldlocalref => new IrRefOf(new IrLocal(ldlocalref.Local)),
+            
+            InstLdTypeRefOf @ldtyperefof => new IrTypeOf(UnwrapValue(instructions)),
             
             InstLdField @ldField => new IrField(ldField.StaticField),
             InstStField @stField => new IrField(stField.StaticField),

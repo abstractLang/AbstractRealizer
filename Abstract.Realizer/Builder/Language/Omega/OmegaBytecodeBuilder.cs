@@ -142,6 +142,8 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             case InstLdStaticField @ldf: sb.Append($"(field {ldf.StaticField.ToReadableReference()})"); break;
             case InstLdField @acf: sb.Append($"(field {acf.StaticField.ToReadableReference()})"); break;
             
+            case InstLdTypeRefOf: sb.Append($"(typeof {WriteInstructionValue(instQueue)})"); break;
+            
             case InstCall @call:
             {
                 sb.Append($"(call {call.function.ToReadableReference()} (");
@@ -229,7 +231,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdSlicePtr(uint ptr, uint len) => AddAndReturn(new InstLdSlicePtr(ptr, len));
         public InstructionWriter LdSlice(byte[] data) => AddAndReturn(new InstLdSlice(data));
         public InstructionWriter LdStringUtf8(string val) => AddAndReturn(new InstLdStringUtf8(val));
-        public InstructionWriter LdNewObject(TypeBuilder r) => AddAndReturn(new InstLdNewObject(r));
+        public InstructionWriter LdNewObject(StructureBuilder r) => AddAndReturn(new InstLdNewObject(r));
         
         public InstructionWriter LdLocal(short index) => AddAndReturn(new InstLdLocal(index));
         public InstructionWriter LdLocalRef(short index) => AddAndReturn(new InstLdLocalRef(index));
@@ -238,9 +240,11 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         public InstructionWriter LdField(InstanceFieldBuilder r) => AddAndReturn(new InstLdField(r));
         public InstructionWriter LdFieldRef() => AddAndReturn(new InstLdFieldRef());
         //public InstructionWriter LdFieldRef() => AddAndReturn(new InstLdStaticField());
+        public InstructionWriter LdIndex() => AddAndReturn(new InstLdIndex());
         public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new InstLdFuncRef(funcref));
         public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new InstLdTypeRef(typeref));
-        public InstructionWriter LdIndex() => AddAndReturn(new InstLdIndex());
+        public InstructionWriter LdTypeRefOf() => AddAndReturn(new InstLdTypeRefOf());
+        public InstructionWriter LdMeta(OmegaMetadataKind kind) => AddAndReturn(new InstLdMeta(kind));
         
         public InstructionWriter StLocal(short index) => AddAndReturn(new InstStLocal(index));
         public InstructionWriter StLocalRef(short index) => AddAndReturn(new InstStLocalRef(index));
