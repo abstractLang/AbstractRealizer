@@ -10,8 +10,7 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
     
     public uint? Length = null;
     public uint? Alignment = null;
-    public uint? VtableLength = null;
-    
+    public uint? VTableSize = null;
     
     internal StructureBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymouns)
         : base(parent, name, annonymouns) {}
@@ -29,9 +28,9 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
         Functions.Add(newFunction);
         return newFunction;
     }
-    public AbstractFunctionBuilder AddAbstractFunction(string symbol)
+    public VirtualFunctionBuilder AddVirtualFunction(string symbol, uint index)
     {
-        var newFunction = new AbstractFunctionBuilder(this, symbol, false);
+        var newFunction = new VirtualFunctionBuilder(this, symbol, index, false);
         Functions.Add(newFunction);
         return newFunction;
     }
@@ -62,7 +61,7 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
         if (Length != null) sb.Append($"(length {Length}) ");
         if (Alignment != null) sb.Append($"(alignment {Alignment})");
         if (Length != null || Alignment != null) sb.AppendLine();
-        if (VtableLength != null) sb.AppendLine($"\t(vtablelength {VtableLength.Value})");
+        if (VTableSize != null) sb.AppendLine($"\t(vtablelength {VTableSize.Value})");
         
         foreach (var i in Fields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in Functions) sb.AppendLine(i.ToString().TabAllLines());

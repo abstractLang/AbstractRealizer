@@ -34,11 +34,9 @@ public class FunctionBuilder: BaseFunctionBuilder
         
         if (_intermediateRoot != null) sb.Append($"\n{_intermediateRoot.ToString().TabAllLines()}");
         else if (BytecodeBuilder != null) sb.Append("\n" + BytecodeBuilder.ToString().TabAllLines());
-        else sb.AppendLine("(no body)");
-        
-        sb.Length -= Environment.NewLine.Length;
+        else sb.Append("(no body)");
+
         sb.Append(')');
-        
         return sb.ToString();
     }
     

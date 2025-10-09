@@ -9,10 +9,8 @@ internal class IrRoot: IrNode
     public override string ToString()
     {
         var sb = new StringBuilder();
-
-        foreach (var item in content)
-            sb.AppendLine(item.ToString());
-        
+        foreach (var item in content) sb.AppendLine(item.ToString());
+        if (sb.Length > Environment.NewLine.Length) sb.Length -= Environment.NewLine.Length;
         return sb.ToString();
     }
 }

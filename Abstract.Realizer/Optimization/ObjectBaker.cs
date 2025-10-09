@@ -24,7 +24,7 @@ public static class ObjectBaker
         StructureBuilder[] structs)
     {
         List<StructureBuilder> toiter = structs.ToList();
-        Dictionary<StructureBuilder, (uint a, uint s, uint v)> baked = [];
+        Dictionary<StructureBuilder, (uint a, uint s)> baked = [];
 
         // FIXME cyclic dependencies will result in 
         // infinite loop
@@ -36,12 +36,10 @@ public static class ObjectBaker
             var cur = toiter[i];
             uint minAlig = configuration.NativeIntegerSize; // Type table ptr
             uint size = configuration.NativeIntegerSize;
-            uint vtableCount = 0;
             
             if (cur.Extends != null)
             {
                 if (!baked.TryGetValue(cur.Extends, out var shit)) goto hardbreak;
-                vtableCount = cur.Extends.VtableLength!.Value;
                 minAlig = Math.Max(minAlig, cur.Extends.Alignment!.Value);;
                 size += cur.Extends.Length!.Value;
             }
@@ -85,21 +83,10 @@ public static class ObjectBaker
                 size += j.Size!.Value;
                 minAlig = Math.Max(minAlig, j.Alignment!.Value);
             }
-
-            foreach (var j in cur.Functions)
-            {
-                switch (j)
-                {
-                    case AbstractFunctionBuilder @absfunc:
-                        absfunc.Index = vtableCount++;
-                        break;
-                }
-            }
             
             cur.Alignment = minAlig;
             cur.Length = size;
-            cur.VtableLength = vtableCount;
-            baked.Add(cur, (minAlig, size, vtableCount));
+            baked.Add(cur, (minAlig, size));
             toiter.RemoveAt(i);
             
             hardbreak: ;

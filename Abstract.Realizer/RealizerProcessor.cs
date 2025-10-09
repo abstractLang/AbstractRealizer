@@ -110,6 +110,9 @@ public class RealizerProcessor
     {
         switch (member)
         {
+            case ImportedFunctionBuilder: break;
+            case VirtualFunctionBuilder: break;
+            
             case NamespaceBuilder @m:
                 foreach (var i in m.Namespaces) UnwrapRecursive(i);
                 foreach (var i in m.Functions) UnwrapRecursive(i);
@@ -136,9 +139,6 @@ public class RealizerProcessor
             case StaticFieldBuilder @f: 
                 fields.Add(f);
                 break;
-            
-            case ImportedFunctionBuilder: break;
-            case AbstractFunctionBuilder: break;
             
             default: throw new NotImplementedException();
         }

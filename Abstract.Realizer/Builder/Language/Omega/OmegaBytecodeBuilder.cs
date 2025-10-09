@@ -32,6 +32,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             newline = true;
         }
         
+        if (sb.Length > Environment.NewLine.Length) sb.Length -= Environment.NewLine.Length;
         return sb.ToString();
     }
 
