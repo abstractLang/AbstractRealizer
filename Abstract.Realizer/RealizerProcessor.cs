@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Abstract.Realizer.Builder;
 using Abstract.Realizer.Builder.Language.Beta;
 using Abstract.Realizer.Builder.ProgramMembers;
@@ -111,7 +112,6 @@ public class RealizerProcessor
         switch (member)
         {
             case ImportedFunctionBuilder: break;
-            case VirtualFunctionBuilder: break;
             
             case NamespaceBuilder @m:
                 foreach (var i in m.Namespaces) UnwrapRecursive(i);
@@ -122,6 +122,7 @@ public class RealizerProcessor
                 break;
             
             case FunctionBuilder @f:
+                if (f.BytecodeBuilder == null) break;
                 f._intermediateRoot = Unwrapper.UnwerapFunction(f);
                 functions.Add(f);
                 break;

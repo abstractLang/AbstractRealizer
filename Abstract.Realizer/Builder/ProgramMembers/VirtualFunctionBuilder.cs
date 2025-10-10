@@ -18,12 +18,12 @@ public class VirtualFunctionBuilder: FunctionBuilder
 
         sb.Append($"(func (virtual {Index}) \"{Symbol}\"");
         foreach (var (name, type) in Parameters) sb.Append($" (param \"{name}\" {type})");
+        if (ReturnType != null) sb.Append($" (ret {ReturnType})");
         
         if (_intermediateRoot != null) sb.Append($"\n{_intermediateRoot.ToString().TabAllLines()}");
         else if (BytecodeBuilder != null) sb.Append("\n" + BytecodeBuilder.ToString().TabAllLines());
-        else sb.AppendLine("(no body)");
+        else sb.Append(" (no body)");
         
-        sb.Length -= Environment.NewLine.Length;
         sb.Append(')');
         
         return sb.ToString();

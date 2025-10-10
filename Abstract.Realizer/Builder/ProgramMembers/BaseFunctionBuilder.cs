@@ -25,9 +25,10 @@ public abstract class BaseFunctionBuilder: ProgramMemberBuilder
         sb.Append('"');
         sb.AppendJoin('.', GlobalIdentifier);
         sb.Append('"');
-        sb.Append('(');
+        sb.Append(" (");
         sb.AppendJoin(", ", Parameters.Select(e => e.Item2.ToString()));
         sb.Append(')');
+        sb.Append(ReturnType == null ? " void" : $" {ReturnType}");
         
         return sb.ToString();
     }
