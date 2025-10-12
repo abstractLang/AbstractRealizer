@@ -16,9 +16,10 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
     public override string ToString()
     {
         var sb = new StringBuilder();
-        var q = new Queue<IOmegaInstruction>(_instructions);
-        while (q.Count > 0) WriteInstruction(sb, q);
-
+        var instQueue = new Queue<IOmegaInstruction>(_instructions);
+        
+        while (instQueue.Count > 0) sb.Append(WriteInstruction(instQueue, false));
+        
         sb.AppendLine();
         var newline = true;
         foreach (var i in _instructions)
@@ -37,8 +38,10 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
     }
 
     
-    private void WriteInstruction(StringBuilder sb, Queue<IOmegaInstruction> instQueue, bool recursive = false)
+    private string WriteInstruction(Queue<IOmegaInstruction> instQueue, bool recursive)
     {
+        var sb = new StringBuilder();
+        
         var a = instQueue.Peek();
         switch (a)
         {
@@ -46,7 +49,6 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 instQueue.Dequeue();
                 sb.Append($"$DEFINE_LOCAL {dl.Type}");
                 break;
-            
             
             case InstNop:
                 instQueue.Dequeue();
@@ -87,11 +89,17 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
+            case InstIf: instQueue.Dequeue(); sb.Append($"(if {WriteInstructionValue(instQueue)}"); break;
+            case InstElse: instQueue.Dequeue(); sb.Append($")(else"); break;
+            case InstEnd: instQueue.Dequeue(); sb.Append(')'); break;
+            
             default:
                 sb.Append(WriteInstructionValue(instQueue).TrimStart('\t'));
                 break;
         }
         if (!recursive) sb.AppendLine();
+
+        return sb.ToString();
     }
     private string WriteInstructionValue(Queue<IOmegaInstruction> instQueue)
     {
@@ -119,7 +127,9 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
             
             
-            case InstSigcast @s: sb.Append("(sigcast." + (s.Signed ? 's' : 'u') + $" {WriteInstructionValue(instQueue)})"); break;
+            case InstSigcast @s: sb.Append("(sigcast."
+                                           + (s.Signed ? 's' : 'u')
+                                           + $" {WriteInstructionValue(instQueue)})"); break;
             case InstTrunc @t: sb.Append($"trunc {WriteInstructionValue(instQueue)})"); break;
             case InstExtend @e: sb.Append($"extend {WriteInstructionValue(instQueue)})"); break;
             case InstConv @c: sb.Append($"conv {WriteInstructionValue(instQueue)}"); break;
@@ -152,7 +162,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                     sb.Append("\n" + WriteInstructionValue(instQueue).TabAllLines());
                 sb.Append("))");
             } break;
-
+            
             case InstLdNewObject @newobj:
                 sb.Append($"newobj({newobj.Type.ToReadableReference()})");
                 break;
@@ -173,8 +183,7 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
             is InstLdField
             or InstStField)
         {
-            sb.Append("->");
-            WriteInstruction(sb, instQueue, true);
+            sb.Append($"->{WriteInstruction(instQueue, true)}");
         }
 
         return sb.ToString();

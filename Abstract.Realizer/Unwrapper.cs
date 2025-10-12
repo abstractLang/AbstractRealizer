@@ -25,7 +25,7 @@ internal static class Unwrapper
         };
 
         while (queue.Count > 0) root.content.Add(UnwrapInstruction(queue));
-            
+        
         return root;
     }
 
@@ -49,7 +49,24 @@ internal static class Unwrapper
             case InstRet @r:
                 instructions.Dequeue();
                 return new IrRet(r.value ? UnwrapValue(instructions) : null);
+                
+            case InstIf:
+            {
+                instructions.Dequeue();
+                var node = new IrIf(UnwrapValue(instructions));
 
+                while (instructions.Peek() is not InstElse and not InstEnd)
+                    node.Then.Add(UnwrapInstruction(instructions));
+
+                if (instructions.Dequeue() is not InstElse) return node;
+                
+                while (instructions.Peek() is not InstEnd)
+                    node.Else.Add(UnwrapInstruction(instructions));
+                
+                instructions.Dequeue();
+                return node;
+            }
+            
             default:
             {
                 IrNode r = UnwrapValue(instructions);
@@ -69,7 +86,7 @@ internal static class Unwrapper
     private static IrValue UnwrapValue(Queue<IOmegaInstruction> instructions)
     {
         var a = instructions.Dequeue();
-        IrValue r = a switch
+        var r = a switch
         {
             IOmegaRequiresTypePrefix => throw new Exception($"instruction \"{a}\" expects type prefix"),
             
@@ -90,7 +107,7 @@ internal static class Unwrapper
             InstLdStringUtf8 @str => new IrSliceBytes(Encoding.UTF8.GetBytes(str.Value)),
             
             InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Count)),
-
+            
             IOmegaTypePrefix @tprefix => UnwrapValueTyped(tprefix, instructions),
             
             _ => throw new UnreachableException(),

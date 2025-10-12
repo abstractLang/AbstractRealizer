@@ -116,10 +116,20 @@ public readonly struct InstRol : IOmegaInstruction, IOmegaRequiresTypePrefix
 
 public readonly struct InstBlock(string label): IOmegaInstruction {}
 public readonly struct InstLoop(string label): IOmegaInstruction { }
-public readonly struct InstIf: IOmegaInstruction { }
-public readonly struct InstElse: IOmegaInstruction { }
+
+public readonly struct InstIf : IOmegaInstruction
+{
+    public override string ToString() => "if";
+}
+public readonly struct InstElse : IOmegaInstruction
+{
+    public override string ToString() => "else";
+}
 public readonly struct InstSwitch(string[] labels): IOmegaInstruction { }
-public readonly struct InstEnd: IOmegaInstruction { }
+public readonly struct InstEnd : IOmegaInstruction
+{
+    public override string ToString() => "end";
+}
 
 public readonly struct InstMStaackEnter(StructureBuilder StackFrame) : IOmegaInstruction
 {
