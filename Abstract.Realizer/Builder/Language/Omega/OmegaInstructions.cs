@@ -117,19 +117,18 @@ public readonly struct InstRol : IOmegaInstruction, IOmegaRequiresTypePrefix
 public readonly struct InstBlock(string label): IOmegaInstruction {}
 public readonly struct InstLoop(string label): IOmegaInstruction { }
 
-public readonly struct InstIf : IOmegaInstruction
+public readonly struct InstBranch(uint to) : IOmegaInstruction
 {
-    public override string ToString() => "if";
+    public readonly uint To = to;
+    public override string ToString() => $"br {To}";
 }
-public readonly struct InstElse : IOmegaInstruction
+public readonly struct InstBranchIf(uint iftrue, uint iffalse) : IOmegaInstruction
 {
-    public override string ToString() => "else";
+    public readonly uint IfTrue = iftrue;
+    public readonly uint IfFalse = iffalse;
+    public override string ToString() => $"br.if {IfTrue}, {IfFalse}";
 }
-public readonly struct InstSwitch(string[] labels): IOmegaInstruction { }
-public readonly struct InstEnd : IOmegaInstruction
-{
-    public override string ToString() => "end";
-}
+
 
 public readonly struct InstMStaackEnter(StructureBuilder StackFrame) : IOmegaInstruction
 {

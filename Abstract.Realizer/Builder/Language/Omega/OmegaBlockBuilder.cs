@@ -6,33 +6,34 @@ using TypeBuilder = Abstract.Realizer.Builder.ProgramMembers.TypeBuilder;
 
 namespace Abstract.Realizer.Builder.Language.Omega;
 
-public class OmegaBytecodeBuilder: BytecodeBuilder
+public class OmegaBlockBuilder: BlockBuilder
 {
     private List<IOmegaInstruction> _instructions = [];
     public List<IOmegaInstruction> InstructionsList => _instructions;
     public InstructionWriter Writer => new(this);
-    
-    
-    public override string ToString()
+
+    internal OmegaBlockBuilder(FunctionBuilder parent, string name, uint idx) : base(parent, name, idx) {}
+
+    public override string DumpInstructionsToString()
     {
         var sb = new StringBuilder();
         var instQueue = new Queue<IOmegaInstruction>(_instructions);
         
         while (instQueue.Count > 0) sb.Append(WriteInstruction(instQueue, false));
         
-        sb.AppendLine();
-        var newline = true;
-        foreach (var i in _instructions)
-        {
-            if (newline) sb.Append(";; ");
-            newline = false;
-            sb.Append(i);
-            
-            if (i is IOmegaFlag) continue;
-            sb.AppendLine();
-            newline = true;
-        }
-        
+        // sb.AppendLine();
+        // var newline = true;
+        // foreach (var i in _instructions)
+        // {
+        //     if (newline) sb.Append(";; ");
+        //     newline = false;
+        //     sb.Append(i);
+        //     
+        //     if (i is IOmegaFlag) continue;
+        //     sb.AppendLine();
+        //     newline = true;
+        // }
+        //
         if (sb.Length > Environment.NewLine.Length) sb.Length -= Environment.NewLine.Length;
         return sb.ToString();
     }
@@ -89,10 +90,12 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
-            case InstIf: instQueue.Dequeue(); sb.Append($"(if {WriteInstructionValue(instQueue)}"); break;
-            case InstElse: instQueue.Dequeue(); sb.Append($")(else"); break;
-            case InstEnd: instQueue.Dequeue(); sb.Append(')'); break;
-            
+            case InstBranch @b: instQueue.Dequeue(); sb.Append($"(branch \"{Parent.CodeBlocks[(int)b.To].Name}\")"); break;
+            case InstBranchIf @b: instQueue.Dequeue(); sb.Append(
+                $"(branch.if {WriteInstructionValue(instQueue)} \"{Parent.CodeBlocks[(int)b.IfTrue].Name}\"" +
+                $" \"{Parent.CodeBlocks[(int)b.IfFalse].Name}\")");
+                break;
+
             default:
                 sb.Append(WriteInstructionValue(instQueue).TrimStart('\t'));
                 break;
@@ -192,8 +195,8 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
 
     public struct InstructionWriter
     {
-        private OmegaBytecodeBuilder _parentBuilder;
-        internal InstructionWriter(OmegaBytecodeBuilder builder) => _parentBuilder = builder;
+        private OmegaBlockBuilder _parentBuilder;
+        internal InstructionWriter(OmegaBlockBuilder builder) => _parentBuilder = builder;
 
         private InstructionWriter AddAndReturn(IOmegaInstruction value)
         {
@@ -227,10 +230,8 @@ public class OmegaBytecodeBuilder: BytecodeBuilder
         
         public InstructionWriter Block(string label) => AddAndReturn(new InstBlock(label));
         public InstructionWriter Loop(string label) => AddAndReturn(new InstLoop(label));
-        public InstructionWriter If() => AddAndReturn(new InstIf());
-        public InstructionWriter Else() => AddAndReturn(new InstElse());
-        public InstructionWriter Switch() => AddAndReturn(new InstSwitch());
-        public InstructionWriter End() => AddAndReturn(new InstEnd());
+        public InstructionWriter Branch(uint to) => AddAndReturn(new InstBranch(to));
+        public InstructionWriter BranchIf(uint iftrue, uint iffalse) => AddAndReturn(new InstBranchIf(iftrue, iffalse));
         
         public InstructionWriter LdConstI1(bool value) => AddAndReturn(new InstLdConstI1(value));
         public InstructionWriter LdConstIptr(ulong value) => AddAndReturn(new InstLdConstIptr(value));

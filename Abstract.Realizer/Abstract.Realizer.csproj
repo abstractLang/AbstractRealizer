@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <Folder Include="Builder\Language\Alpha\" />
+      <Folder Include="Builder\Language\Beta\" />
       <Folder Include="Core\Configuration\" />
     </ItemGroup>
 

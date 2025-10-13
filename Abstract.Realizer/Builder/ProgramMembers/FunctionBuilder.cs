@@ -14,21 +14,22 @@ public class FunctionBuilder: BaseFunctionBuilder
                            && Parameters[0].name == "self"
                            && (Parameters[0].type is ReferenceTypeReference { Subtype: NodeTypeReference @ntr } 
                            && ntr.TypeReference == Parent);
-    
-    public BytecodeBuilder? BytecodeBuilder { get; internal set;  }
-    internal IrRoot? _intermediateRoot = null;
+
+    public readonly List<BlockBuilder> CodeBlocks = [];
 
     internal FunctionBuilder(INamespaceOrStructureBuilder parent, string name, bool annonymous)
         : base(parent, name, annonymous) {}
     
     
-    public OmegaBytecodeBuilder GetOrCreateOmegaBuilder()
+    public OmegaBlockBuilder CreateOmegaBytecodeBlock(string name)
     {
-        if (BytecodeBuilder is not null and not OmegaBytecodeBuilder)
-            throw new Exception($"{BytecodeBuilder.GetType().Name} already instantiated!");
+        var realname = name;
+        var i = 1;
+        while (CodeBlocks.Any(e => e.Name == realname)) realname = name + i++;
 
-        BytecodeBuilder ??= new OmegaBytecodeBuilder();
-        return (BytecodeBuilder as OmegaBytecodeBuilder)!;
+        var block = new OmegaBlockBuilder(this, realname, (uint)CodeBlocks.Count);
+        CodeBlocks.Add(block);
+        return block;
     }
 
     public override string ToString()
@@ -38,10 +39,13 @@ public class FunctionBuilder: BaseFunctionBuilder
         sb.Append($"(func \"{Symbol}\"");
         foreach (var (name, type) in Parameters) sb.Append($" (param \"{name}\" {type})");
         if (ReturnType != null) sb.Append($" (ret {ReturnType})");
-        
-        if (_intermediateRoot != null) sb.Append($"\n{_intermediateRoot.ToString().TabAllLines()}");
-        else if (BytecodeBuilder != null) sb.Append("\n" + BytecodeBuilder.ToString().TabAllLines());
-        else sb.Append(" (no body)");
+
+        foreach (var builder in CodeBlocks)
+        {
+            sb.AppendLine($"\n\t(block \"{builder.Name}\"");
+            sb.Append($"{builder.DumpInstructionsToString().TabAllLines().TabAllLines()})");
+        }
+        if (CodeBlocks.Count == 0) sb.Append("(no_body)");
 
         sb.Append(')');
         return sb.ToString();

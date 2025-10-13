@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Text;
+using Abstract.Realizer.Builder.Language;
 using Abstract.Realizer.Builder.Language.Omega;
 using Abstract.Realizer.Builder.ProgramMembers;
 using Abstract.Realizer.Builder.References;
@@ -15,21 +16,28 @@ internal static class Unwrapper
     // it must unwrap the instruction into an lisp-like
     // intermediate representation.
     
-    public static IrRoot UnwerapFunction(FunctionBuilder function)
+    public static void UnwerapFunction(FunctionBuilder function)
     {
-        var root = new IrRoot();
-        Queue<IOmegaInstruction> queue = function.BytecodeBuilder switch
-        {
-            OmegaBytecodeBuilder @omega => new Queue<IOmegaInstruction>(omega.InstructionsList),
-            _ => throw new ArgumentException("function do not has a valid input bytecode!")
-        };
+        List<IntermediateBlockBuilder> newblocks = [];
+        newblocks.AddRange(function.CodeBlocks.Select(builder
+            => new IntermediateBlockBuilder(function, builder.Name, builder.Index)));
 
-        while (queue.Count > 0) root.content.Add(UnwrapInstruction(queue));
+        foreach (var (i, builder) in function.CodeBlocks.ToArray().Index())
+        {
+            var irblock = newblocks[i].Root;
         
-        return root;
+            var queue = builder switch
+            {
+                OmegaBlockBuilder @omega => new Queue<IOmegaInstruction>(omega.InstructionsList),
+                _ => throw new ArgumentException("function do not has a valid input bytecode!")
+            };
+
+            while (queue.Count > 0) irblock.content.Add(UnwrapInstruction(queue, newblocks));
+            function.CodeBlocks[i] = newblocks[i];
+        }
     }
 
-    private static IrNode UnwrapInstruction(Queue<IOmegaInstruction> instructions)
+    private static IrNode UnwrapInstruction(Queue<IOmegaInstruction> instructions, List<IntermediateBlockBuilder> newblocks)
     {
         var a = instructions.Peek();
         switch (a)
@@ -40,40 +48,32 @@ internal static class Unwrapper
             
             case InstStLocal stLocal:
                 instructions.Dequeue();
-                return new IrAssign(new IrLocal(stLocal.index), UnwrapValue(instructions));
+                return new IrAssign(new IrLocal(stLocal.index), UnwrapValue(instructions, newblocks));
             
             case InstStField stField:
                 instructions.Dequeue();
-                return new IrAssign(new IrField(stField.StaticField), UnwrapValue(instructions));
+                return new IrAssign(new IrField(stField.StaticField), UnwrapValue(instructions, newblocks));
             
             case InstRet @r:
                 instructions.Dequeue();
-                return new IrRet(r.value ? UnwrapValue(instructions) : null);
+                return new IrRet(r.value ? UnwrapValue(instructions, newblocks) : null);
                 
-            case InstIf:
-            {
+            case InstBranch @b:
                 instructions.Dequeue();
-                var node = new IrIf(UnwrapValue(instructions));
-
-                while (instructions.Peek() is not InstElse and not InstEnd)
-                    node.Then.Add(UnwrapInstruction(instructions));
-
-                if (instructions.Dequeue() is not InstElse) return node;
-                
-                while (instructions.Peek() is not InstEnd)
-                    node.Else.Add(UnwrapInstruction(instructions));
-                
+                return new IrBranch(newblocks[(int)b.To]);
+            
+            case InstBranchIf @b:
                 instructions.Dequeue();
-                return node;
-            }
+                return new IrBranchIf(UnwrapValue(instructions, newblocks),
+                    newblocks[(int)b.IfTrue], newblocks[(int)b.IfFalse]);
             
             default:
             {
-                IrNode r = UnwrapValue(instructions);
+                IrNode r = UnwrapValue(instructions, newblocks);
 
                 while (instructions.Count > 0 && instructions.Peek() is InstStField)
                 {
-                    var b = (IrAssign)UnwrapInstruction(instructions);
+                    var b = (IrAssign)UnwrapInstruction(instructions, newblocks);
                     var c = new IrAccess((IrValue)r, (IrValue)b.to);
                     r = new IrAssign(c, b.value);
                 }
@@ -83,7 +83,7 @@ internal static class Unwrapper
         }
     }
 
-    private static IrValue UnwrapValue(Queue<IOmegaInstruction> instructions)
+    private static IrValue UnwrapValue(Queue<IOmegaInstruction> instructions, List<IntermediateBlockBuilder> newblocks)
     {
         var a = instructions.Dequeue();
         var r = a switch
@@ -95,7 +95,7 @@ internal static class Unwrapper
             
             InstLdLocalRef @ldlocalref => new IrRefOf(new IrLocal(ldlocalref.Local)),
             
-            InstLdTypeRefOf @ldtyperefof => new IrTypeOf(UnwrapValue(instructions)),
+            InstLdTypeRefOf @ldtyperefof => new IrTypeOf(UnwrapValue(instructions, newblocks)),
             
             InstLdField @ldField => new IrField(ldField.StaticField),
             InstStField @stField => new IrField(stField.StaticField),
@@ -106,16 +106,16 @@ internal static class Unwrapper
             
             InstLdStringUtf8 @str => new IrSliceBytes(Encoding.UTF8.GetBytes(str.Value)),
             
-            InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Count)),
+            InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Count, newblocks)),
             
-            IOmegaTypePrefix @tprefix => UnwrapValueTyped(tprefix, instructions),
+            IOmegaTypePrefix @tprefix => UnwrapValueTyped(tprefix, instructions, newblocks),
             
             _ => throw new UnreachableException(),
         };
                 
         while (instructions.Count > 0 && instructions.Peek() is InstLdField)
         {
-            var b = UnwrapValue(instructions);
+            var b = UnwrapValue(instructions, newblocks);
             r = new IrAccess(r, b);
             
         }
@@ -123,7 +123,7 @@ internal static class Unwrapper
         return r;
     }
 
-    private static IrValue UnwrapValueTyped(IOmegaTypePrefix type, Queue<IOmegaInstruction> instructions)
+    private static IrValue UnwrapValueTyped(IOmegaTypePrefix type, Queue<IOmegaInstruction> instructions, List<IntermediateBlockBuilder> newblocks)
     {
         RealizerType typeref = type switch
         {
@@ -135,37 +135,37 @@ internal static class Unwrapper
         return a switch
         {
             InstAdd => new IrBinaryOp(typeref, BinaryOperation.Add,
-                UnwrapValue(instructions), UnwrapValue(instructions)),
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
 
             InstSub => new IrBinaryOp(typeref, BinaryOperation.Sub,
-                UnwrapValue(instructions), UnwrapValue(instructions)),
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
 
             InstMul => new IrBinaryOp(typeref, BinaryOperation.Mul,
-                UnwrapValue(instructions), UnwrapValue(instructions)),
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
 
             
             InstAnd => new IrBinaryOp(typeref, BinaryOperation.BitAnd,
-                UnwrapValue(instructions), UnwrapValue(instructions)),
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
             
             InstOr => new IrBinaryOp(typeref, BinaryOperation.BitOr,
-                UnwrapValue(instructions), UnwrapValue(instructions)),
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
             
             InstXor => new IrBinaryOp(typeref, BinaryOperation.BitXor,
-                UnwrapValue(instructions), UnwrapValue(instructions)),
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
             
             
-            InstConv => new IrConv(typeref, UnwrapValue(instructions)),
-            InstExtend => new IrExtend((IntegerType)typeref, UnwrapValue(instructions)),
-            InstTrunc => new IrTrunc((IntegerType)typeref, UnwrapValue(instructions)),
+            InstConv => new IrConv(typeref, UnwrapValue(instructions, newblocks)),
+            InstExtend => new IrExtend((IntegerType)typeref, UnwrapValue(instructions, newblocks)),
+            InstTrunc => new IrTrunc((IntegerType)typeref, UnwrapValue(instructions, newblocks)),
             
             _ => throw new Exception($"Instruction \"{a}\" does not allows type prefix"),
         };
     }
 
-    private static IrValue[] UnwrapValues(Queue<IOmegaInstruction> instructions, int count)
+    private static IrValue[] UnwrapValues(Queue<IOmegaInstruction> instructions, int count, List<IntermediateBlockBuilder> newblocks)
     {
         List<IrValue> values = [];
-        for (var c = 0; c < count; c++) values.Add(UnwrapValue(instructions));
+        for (var c = 0; c < count; c++) values.Add(UnwrapValue(instructions, newblocks));
         return [..values];
     }
 }

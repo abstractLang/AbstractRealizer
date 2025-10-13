@@ -20,9 +20,12 @@ public class VirtualFunctionBuilder: FunctionBuilder
         foreach (var (name, type) in Parameters) sb.Append($" (param \"{name}\" {type})");
         if (ReturnType != null) sb.Append($" (ret {ReturnType})");
         
-        if (_intermediateRoot != null) sb.Append($"\n{_intermediateRoot.ToString().TabAllLines()}");
-        else if (BytecodeBuilder != null) sb.Append("\n" + BytecodeBuilder.ToString().TabAllLines());
-        else sb.Append(" (no body)");
+        foreach (var builder in CodeBlocks)
+        {
+            sb.AppendLine($"\n\t(block \"{builder.Name}\"");
+            sb.Append($"{builder.DumpInstructionsToString().TabAllLines().TabAllLines()})");
+        }
+        if (CodeBlocks.Count == 0) sb.Append("(no_body)");
         
         sb.Append(')');
         

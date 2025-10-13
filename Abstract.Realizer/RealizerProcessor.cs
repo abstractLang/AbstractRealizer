@@ -1,11 +1,8 @@
-using System.Reflection.Metadata.Ecma335;
 using Abstract.Realizer.Builder;
-using Abstract.Realizer.Builder.Language.Beta;
+using Abstract.Realizer.Builder.Language;
 using Abstract.Realizer.Builder.ProgramMembers;
 using Abstract.Realizer.Compiler;
 using Abstract.Realizer.Core.Configuration.LangOutput;
-using Abstract.Realizer.Core.Intermediate;
-using Abstract.Realizer.Core.Intermediate.Language;
 using Abstract.Realizer.Optimization;
 
 namespace Abstract.Realizer;
@@ -58,15 +55,18 @@ public class RealizerProcessor
 
         foreach (var function in functions)
         {
-            switch (compileTo)
+            foreach (var (i, b) in function.CodeBlocks.ToArray().Index())
             {
-                case LanguageOutput.Alpha: throw new NotImplementedException();
+                if (b is not IntermediateBlockBuilder @block) throw new Exception("Invalid block type");
                 
-                case LanguageOutput.Beta:
-                    if (function.BytecodeBuilder is BetaBytecodeBuilder) continue;
-                    BetaCompiler.CompileFunction(function, (BetaOutputConfiguration)configuration);
-                    break;
-                
+                function.CodeBlocks[i] = compileTo switch
+                {
+                    LanguageOutput.Omega => OmegaCompiler.CompileBlock(block, (OmegaOutputConfiguration)configuration),
+                    
+                    LanguageOutput.Alpha or 
+                        LanguageOutput.Beta or
+                    _ => throw new NotImplementedException()
+                };
             }
         }
 
@@ -122,8 +122,8 @@ public class RealizerProcessor
                 break;
             
             case FunctionBuilder @f:
-                if (f.BytecodeBuilder == null) break;
-                f._intermediateRoot = Unwrapper.UnwerapFunction(f);
+                if (f.CodeBlocks.Count == 0) break;
+                Unwrapper.UnwerapFunction(f);
                 functions.Add(f);
                 break;
             
