@@ -154,6 +154,18 @@ internal static class Unwrapper
                 UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
             
             
+            InstCmpEq => new IrCmp(((IntegerType)typeref).Signed, CompareOperation.Equals,
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
+            InstCmpGr => new IrCmp(((IntegerType)typeref).Signed, CompareOperation.Greater,
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
+            InstCmpGe => new IrCmp(((IntegerType)typeref).Signed, CompareOperation.GreatherEquals,
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
+            InstCmpLr => new IrCmp(((IntegerType)typeref).Signed, CompareOperation.Lesser,
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
+            InstCmpLe => new IrCmp(((IntegerType)typeref).Signed, CompareOperation.LesserEquals,
+                UnwrapValue(instructions, newblocks), UnwrapValue(instructions, newblocks)),
+            
+            
             InstConv => new IrConv(typeref, UnwrapValue(instructions, newblocks)),
             InstExtend => new IrExtend((IntegerType)typeref, UnwrapValue(instructions, newblocks)),
             InstTrunc => new IrTrunc((IntegerType)typeref, UnwrapValue(instructions, newblocks)),

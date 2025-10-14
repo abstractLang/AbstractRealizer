@@ -45,7 +45,25 @@ internal static class OmegaCompiler
                 UnwrapNode(builder, bop.Left, DataMode.Load, configuration);
                 UnwrapNode(builder, bop.Right, DataMode.Load, configuration);
                 break;
-                
+
+            case IrCmp cmp:
+            {
+                UnwrapTypeFlag(builder, new IntegerType(cmp.Signed, 1), configuration);
+                switch (cmp.Op)
+                {
+                    case CompareOperation.Equals: builder.Writer.CmpEq(); break;
+                    case CompareOperation.NotEquals: builder.Writer.CmpNeq(); break;
+                    case CompareOperation.Greater: builder.Writer.CmpGr(); break;
+                    case CompareOperation.GreatherEquals: builder.Writer.CmpGe(); break;
+                    case CompareOperation.Lesser: builder.Writer.CmpLr(); break;
+                    case CompareOperation.LesserEquals: builder.Writer.CmpLe(); break;
+                    
+                    default: throw new ArgumentOutOfRangeException();
+                }
+                UnwrapNode(builder, cmp.Left, DataMode.Load, configuration);
+                UnwrapNode(builder, cmp.Right, DataMode.Load, configuration);
+            } break;
+            
             case IrAssign assign:
                 UnwrapNode(builder, (IrNode)assign.to, DataMode.Store, configuration);
                 UnwrapNode(builder, assign.value, DataMode.Load, configuration);

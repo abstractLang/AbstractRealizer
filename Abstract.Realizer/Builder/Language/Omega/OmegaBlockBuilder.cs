@@ -112,7 +112,10 @@ public class OmegaBlockBuilder: BlockBuilder
         var a = instQueue.Dequeue();
         switch (a)
         {
-            case InstNot: sb.Append($"not\n\t{WriteInstructionValue(instQueue)})"); break;
+            case InstInc: sb.Append($"(inc {WriteInstructionValue(instQueue)})"); break;
+            case InstDec: sb.Append($"(dec {WriteInstructionValue(instQueue)})"); break;
+            
+            case InstNot: sb.Append($"NOT\n\t{WriteInstructionValue(instQueue)})"); break;
             case InstAdd: sb.Append($"add" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
@@ -128,6 +131,25 @@ public class OmegaBlockBuilder: BlockBuilder
             case InstXor: sb.Append($"XOR" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            
+            case InstCmpEq: sb.Append($"(cmp" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} == " +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstCmpNeq: sb.Append($"(cmp" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} != " +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstCmpGr: sb.Append($"(cmp" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} > " +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstCmpGe: sb.Append($"(cmp" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} >= " +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstCmpLr: sb.Append($"(cmp" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} < " +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstCmpLe: sb.Append($"(cmp" +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} <= " +
+                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
             
             
             case InstSigcast @s: sb.Append("(sigcast."
@@ -213,6 +235,8 @@ public class OmegaBlockBuilder: BlockBuilder
         public InstructionWriter CallVirt() => AddAndReturn(new InstCallvirt());
         public InstructionWriter Ret(bool value) => AddAndReturn(new InstRet(value));
         
+        public InstructionWriter Inc() => AddAndReturn(new InstDec());
+        public InstructionWriter Dec() => AddAndReturn(new InstDec());
         public InstructionWriter Add() => AddAndReturn(new InstAdd());
         public InstructionWriter Sub() => AddAndReturn(new InstSub());
         public InstructionWriter Mul() => AddAndReturn(new InstMul());
@@ -268,6 +292,13 @@ public class OmegaBlockBuilder: BlockBuilder
         public InstructionWriter Trunc() => AddAndReturn(new InstTrunc());
         public InstructionWriter Sigcast(bool signess) => AddAndReturn(new InstSigcast(signess));
         public InstructionWriter Bitcast() => AddAndReturn(new InstBitcast());
+
+        public InstructionWriter CmpEq() => AddAndReturn(new InstCmpEq());
+        public InstructionWriter CmpNeq() => AddAndReturn(new InstCmpNeq());
+        public InstructionWriter CmpGr() => AddAndReturn(new InstCmpGr());
+        public InstructionWriter CmpLr() => AddAndReturn(new InstCmpLr());
+        public InstructionWriter CmpGe() => AddAndReturn(new InstCmpGe());
+        public InstructionWriter CmpLe() => AddAndReturn(new InstCmpLe());
         
         public InstructionWriter MemCopy() => AddAndReturn(new InstMemCopy());
         public InstructionWriter MemFill() => AddAndReturn(new InstMemFill());

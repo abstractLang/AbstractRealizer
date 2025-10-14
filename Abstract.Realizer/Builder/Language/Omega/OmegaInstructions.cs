@@ -55,6 +55,14 @@ public readonly struct InstRet(bool value) : IOmegaInstruction
     public override string ToString() => "ret" + (value ? "v" : "");
 }
 
+public readonly struct InstInc : IOmegaInstruction, IOmegaRequiresTypePrefix
+{
+    public override string ToString() => "inc";
+}
+public readonly struct InstDec : IOmegaInstruction, IOmegaRequiresTypePrefix
+{
+    public override string ToString() => "dec";
+}
 
 public readonly struct InstAdd : IOmegaInstruction, IOmegaRequiresTypePrefix
 {
@@ -307,6 +315,31 @@ public readonly struct InstBitcast(u8 len) : IOmegaInstruction
 {
     public readonly u8 Len = len;
     public override string ToString() => $"bitcast {Len}";
+}
+
+public readonly struct InstCmpEq() : IOmegaInstruction
+{
+    public override string ToString() => "cmp.eq";
+}
+public readonly struct InstCmpNeq() : IOmegaInstruction
+{
+    public override string ToString() => "cmp.neq";
+}
+public readonly struct InstCmpGr() : IOmegaInstruction
+{
+    public override string ToString() => "cmp.gr";
+}
+public readonly struct InstCmpGe() : IOmegaInstruction
+{
+    public override string ToString() => "cmp.ge";
+}
+public readonly struct InstCmpLr() : IOmegaInstruction
+{
+    public override string ToString() => "cmp.lr";
+}
+public readonly struct InstCmpLe() : IOmegaInstruction
+{
+    public override string ToString() => "cmp.le";
 }
 
 

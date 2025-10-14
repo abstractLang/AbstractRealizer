@@ -12,3 +12,13 @@ public enum BinaryOperation
     BitOr,
     BitXor,
 }
+
+public enum CompareOperation
+{
+    Equals,
+    NotEquals,
+    Greater,
+    Lesser,
+    GreatherEquals,
+    LesserEquals,
+}
