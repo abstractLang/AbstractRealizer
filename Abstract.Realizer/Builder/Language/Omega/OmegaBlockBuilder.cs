@@ -119,6 +119,9 @@ public class OmegaBlockBuilder: BlockBuilder
             case InstAdd: sb.Append($"add" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstSub: sb.Append($"sub" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
+                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
             case InstMul: sb.Append($"mul" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
                                     $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
