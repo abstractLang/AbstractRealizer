@@ -24,7 +24,6 @@ public class ImportedFunctionBuilder: BaseFunctionBuilder
         if (ImportDomain != null && ImportSymbol != null) sb.Append($" (import \"{ImportDomain}\" \"{ImportSymbol}\")");
         else if (ImportSymbol != null) sb.Append($" (import \"{ImportSymbol}\")");
         else sb.Append($" (import nullptr)");
-        sb.Append(')');
         
         return sb.ToString();
     }

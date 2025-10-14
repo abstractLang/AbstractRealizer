@@ -80,20 +80,20 @@ public class OmegaBlockBuilder: BlockBuilder
             case InstStStaticField @stfld:
             {
                 instQueue.Dequeue();
-                sb.Append($"(field {stfld.StaticField.ToReadableReference()}) = ");
+                sb.Append($"{stfld.StaticField.ToReadableReference()} = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             case InstStField @stfld:
             {
                 instQueue.Dequeue();
-                sb.Append($"(field {stfld.StaticField.ToReadableReference()}) = ");
+                sb.Append($"{stfld.StaticField.ToReadableReference()} = ");
                 sb.Append(WriteInstructionValue(instQueue).TabAllLines().TrimStart('\t'));
             } break;
             
-            case InstBranch @b: instQueue.Dequeue(); sb.Append($"(branch \"{Parent.CodeBlocks[(int)b.To].Name}\")"); break;
+            case InstBranch @b: instQueue.Dequeue(); sb.Append($"branch \"{Parent.CodeBlocks[(int)b.To].Name}\""); break;
             case InstBranchIf @b: instQueue.Dequeue(); sb.Append(
-                $"(branch.if {WriteInstructionValue(instQueue)} \"{Parent.CodeBlocks[(int)b.IfTrue].Name}\"" +
-                $" \"{Parent.CodeBlocks[(int)b.IfFalse].Name}\")");
+                $"(branch {WriteInstructionValue(instQueue)} ? \"{Parent.CodeBlocks[(int)b.IfTrue].Name}\"" +
+                $" : \"{Parent.CodeBlocks[(int)b.IfFalse].Name}\"");
                 break;
 
             default:
@@ -112,47 +112,35 @@ public class OmegaBlockBuilder: BlockBuilder
         var a = instQueue.Dequeue();
         switch (a)
         {
-            case InstInc: sb.Append($"(inc {WriteInstructionValue(instQueue)})"); break;
-            case InstDec: sb.Append($"(dec {WriteInstructionValue(instQueue)})"); break;
+            case InstInc: sb.Append($"inc {WriteInstructionValue(instQueue)}"); break;
+            case InstDec: sb.Append($"dec {WriteInstructionValue(instQueue)}"); break;
             
-            case InstNot: sb.Append($"NOT\n\t{WriteInstructionValue(instQueue)})"); break;
-            case InstAdd: sb.Append($"add" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstSub: sb.Append($"sub" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstMul: sb.Append($"mul" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstAnd: sb.Append($"AND" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstOr: sb.Append($"OR" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstXor: sb.Append($"XOR" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()}" +
-                                    $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstNot: sb.Append($"!{WriteInstructionValue(instQueue)}"); break;
+            case InstAdd: sb.Append($"{WriteInstructionValue(instQueue)} + " +
+                                    $"{WriteInstructionValue(instQueue)})"); break;
+            case InstSub: sb.Append($"{WriteInstructionValue(instQueue)} - " +
+                                    $"{WriteInstructionValue(instQueue)})"); break;
+            case InstMul: sb.Append($"{WriteInstructionValue(instQueue)} * " +
+                                    $"{WriteInstructionValue(instQueue)})"); break;
+            case InstAnd: sb.Append($"{WriteInstructionValue(instQueue)} & " +
+                                    $"{WriteInstructionValue(instQueue)})"); break;
+            case InstOr:  sb.Append($"{WriteInstructionValue(instQueue)} | " +
+                                    $"{WriteInstructionValue(instQueue)})"); break;
+            case InstXor: sb.Append($"{WriteInstructionValue(instQueue)} ^ " +
+                                    $"{WriteInstructionValue(instQueue)})"); break;
             
-            case InstCmpEq: sb.Append($"(cmp" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} == " +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstCmpNeq: sb.Append($"(cmp" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} != " +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstCmpGr: sb.Append($"(cmp" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} > " +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstCmpGe: sb.Append($"(cmp" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} >= " +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstCmpLr: sb.Append($"(cmp" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} < " +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
-            case InstCmpLe: sb.Append($"(cmp" +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()} <= " +
-                                      $"\n{WriteInstructionValue(instQueue).TabAllLines()})"); break;
+            case InstCmpEq:  sb.Append($"{WriteInstructionValue(instQueue)} == " +
+                                       $"{WriteInstructionValue(instQueue)}"); break;
+            case InstCmpNeq: sb.Append($"{WriteInstructionValue(instQueue)} != " +
+                                       $"{WriteInstructionValue(instQueue)}"); break;
+            case InstCmpGr: sb.Append($"{WriteInstructionValue(instQueue)} > " +
+                                      $"{WriteInstructionValue(instQueue)})"); break;
+            case InstCmpGe: sb.Append($"{WriteInstructionValue(instQueue)} >= " +
+                                      $"{WriteInstructionValue(instQueue)}"); break;
+            case InstCmpLr: sb.Append($"{WriteInstructionValue(instQueue)} < " +
+                                      $"{WriteInstructionValue(instQueue)}"); break;
+            case InstCmpLe: sb.Append($"{WriteInstructionValue(instQueue)} <= " +
+                                      $"{WriteInstructionValue(instQueue)}"); break;
             
             
             case InstSigcast @s: sb.Append("(sigcast."
@@ -167,7 +155,7 @@ public class OmegaBlockBuilder: BlockBuilder
             case InstLdConstIptr @ldc: sb.Append($"(const ptr 0x{ldc.Value:x})"); break;
             
             case InstLdSlicePtr @sliceptr: sb.Append($"(slice.ptr 0x{sliceptr.Pointer:x} {sliceptr.Length})"); break;
-            case InstLdSlice @slice: sb.Append($"(slice [{slice.Content}])"); break;
+            case InstLdSlice @slice: sb.Append($"(slice [{string.Concat(slice.Content.Select(e => $"{e:x2}"))}])"); break;
             case InstLdStringUtf8 @str: sb.Append($"(string \"{str.Value}\""); break;
             
             case InstLdLocal @ldl:
@@ -176,32 +164,31 @@ public class OmegaBlockBuilder: BlockBuilder
                 break;
             case InstLdLocalRef @ldr:
                 if (ldr.Local < 0) sb.Append($"(arg.ref {(-ldr.Local)-1})");
-                else sb.Append($"(local.ref {ldr.Local})");
+                else sb.Append($"&(local {ldr.Local})");
                 break;
-            case InstLdStaticField @ldf: sb.Append($"(field {ldf.StaticField.ToReadableReference()})"); break;
-            case InstLdField @acf: sb.Append($"(field {acf.StaticField.ToReadableReference()})"); break;
+            case InstLdStaticField @ldf: sb.Append($"{ldf.StaticField.ToReadableReference()}"); break;
+            case InstLdField @acf: sb.Append($"{acf.StaticField.ToReadableReference()}"); break;
             
             case InstLdTypeRefOf: sb.Append($"(typeof {WriteInstructionValue(instQueue)})"); break;
             
             case InstCall @call:
             {
-                sb.Append($"(call {call.function.ToReadableReference()} (");
+                sb.Append($"call {call.function.ToReadableReference()}");
                 foreach (var i in call.function.Parameters)
-                    sb.Append("\n" + WriteInstructionValue(instQueue).TabAllLines());
-                sb.Append("))");
+                    sb.Append(" " + WriteInstructionValue(instQueue));
             } break;
             
             case InstLdNewObject @newobj:
-                sb.Append($"newobj({newobj.Type.ToReadableReference()})");
+                sb.Append($"new {newobj.Type.ToReadableReference()}");
                 break;
             
             case FlagTypeInt @tint:
-                sb.Append("(" + (tint.Signed ? "s" : "u") + (tint.Size.HasValue ? $"{tint.Size}" : "ptr") + '.');
-                sb.Append(WriteInstructionValue(instQueue));
+                sb.Append("(" + (tint.Signed ? "s" : "u") + (tint.Size.HasValue ? $"{tint.Size}" : "ptr") + ')');
+                sb.Append("(" + WriteInstructionValue(instQueue) + ")");
                 break;
             case FlagTypeFloat @tflo:
-                sb.Append($"f{tflo.Size}.");
-                sb.Append(WriteInstructionValue(instQueue));
+                sb.Append($"f{tflo.Size})");
+                sb.Append("(" + WriteInstructionValue(instQueue) + ")");
                 break;
             
             default: throw new NotImplementedException();

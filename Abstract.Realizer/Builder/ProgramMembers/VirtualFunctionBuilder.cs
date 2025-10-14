@@ -22,12 +22,10 @@ public class VirtualFunctionBuilder: FunctionBuilder
         
         foreach (var builder in CodeBlocks)
         {
-            sb.AppendLine($"\n\t(block \"{builder.Name}\"");
-            sb.Append($"{builder.DumpInstructionsToString().TabAllLines().TabAllLines()})");
+            sb.AppendLine($"\n\t{builder.Name}:");
+            sb.AppendLine($"{builder.DumpInstructionsToString().TabAllLines().TabAllLines()})");
         }
         if (CodeBlocks.Count == 0) sb.Append("(no_body)");
-        
-        sb.Append(')');
         
         return sb.ToString();
     }
