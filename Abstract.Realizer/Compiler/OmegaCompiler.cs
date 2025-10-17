@@ -112,9 +112,14 @@ internal static class OmegaCompiler
                     _ => datamode
                 }, configuration);
                 break;
-
             
             case IrNewObj newobj: builder.Writer.LdNewObject(newobj.Type); break;
+
+            case IrSelf:
+            {
+                if ((configuration.AllowedInstructions & OmegaInstructions.LdSelf) != 0) builder.Writer.LdSelf();
+                else builder.Writer.LdLocal(-1); // FIXME maaaaybe it can cause undefined behavior
+            } break;
             
             case IrInteger constint: 
                 if (constint.Size.HasValue) builder.Writer.LdConstI(constint.Size.Value, constint.Value);

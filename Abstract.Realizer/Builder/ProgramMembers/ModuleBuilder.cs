@@ -14,6 +14,7 @@ public class ModuleBuilder: NamespaceBuilder
 
         sb.AppendLine($"(module \"{Symbol}\"");
         foreach (var i in namespaces) sb.AppendLine(i.ToString().TabAllLines());
+        foreach (var i in fields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in functions) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in structures) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in typedefs) sb.AppendLine(i.ToString().TabAllLines());

@@ -122,9 +122,6 @@ public readonly struct InstRol : IOmegaInstruction, IOmegaRequiresTypePrefix
 }
 
 
-public readonly struct InstBlock(string label): IOmegaInstruction {}
-public readonly struct InstLoop(string label): IOmegaInstruction { }
-
 public readonly struct InstBranch(uint to) : IOmegaInstruction
 {
     public readonly uint To = to;
@@ -248,7 +245,10 @@ public readonly struct InstLdTypeRefOf() : IOmegaInstruction
 {
     public override string ToString() => $"ld.type.ref.of";
 }
-
+public readonly struct InstLdSelf() : IOmegaInstruction
+{
+    public override string ToString() => $"ld.self";
+}
 public readonly struct InstLdMeta(OmegaMetadataKind kind) : IOmegaInstruction
 {
     public readonly OmegaMetadataKind Kind = kind;

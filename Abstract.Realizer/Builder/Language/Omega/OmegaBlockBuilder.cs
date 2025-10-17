@@ -145,9 +145,9 @@ public class OmegaBlockBuilder: BlockBuilder
             
             case InstSigcast @s: sb.Append("(sigcast."
                                            + (s.Signed ? 's' : 'u')
-                                           + $" {WriteInstructionValue(instQueue)})"); break;
-            case InstTrunc @t: sb.Append($"trunc {WriteInstructionValue(instQueue)})"); break;
-            case InstExtend @e: sb.Append($"extend {WriteInstructionValue(instQueue)})"); break;
+                                           + $" {WriteInstructionValue(instQueue)}"); break;
+            case InstTrunc @t: sb.Append($"trunc {WriteInstructionValue(instQueue)}"); break;
+            case InstExtend @e: sb.Append($"extend {WriteInstructionValue(instQueue)}"); break;
             case InstConv @c: sb.Append($"conv {WriteInstructionValue(instQueue)}"); break;
             
             case InstLdConstI @ldconsti: sb.Append($"(const {ldconsti.Len} 0x{ldconsti.Value:x})"); break;
@@ -170,6 +170,8 @@ public class OmegaBlockBuilder: BlockBuilder
             case InstLdField @acf: sb.Append($"{acf.StaticField.ToReadableReference()}"); break;
             
             case InstLdTypeRefOf: sb.Append($"(typeof {WriteInstructionValue(instQueue)})"); break;
+            
+            case InstLdSelf: sb.Append("ld.self"); break;
             
             case InstCall @call:
             {
@@ -242,8 +244,6 @@ public class OmegaBlockBuilder: BlockBuilder
         public InstructionWriter Ror() => AddAndReturn(new InstRor());
         public InstructionWriter Rol() => AddAndReturn(new InstRol());
         
-        public InstructionWriter Block(string label) => AddAndReturn(new InstBlock(label));
-        public InstructionWriter Loop(string label) => AddAndReturn(new InstLoop(label));
         public InstructionWriter Branch(uint to) => AddAndReturn(new InstBranch(to));
         public InstructionWriter BranchIf(uint iftrue, uint iffalse) => AddAndReturn(new InstBranchIf(iftrue, iffalse));
         
@@ -269,6 +269,7 @@ public class OmegaBlockBuilder: BlockBuilder
         public InstructionWriter LdFuncRef(FunctionBuilder funcref) => AddAndReturn(new InstLdFuncRef(funcref));
         public InstructionWriter LdTypeRef(TypeBuilder typeref) => AddAndReturn(new InstLdTypeRef(typeref));
         public InstructionWriter LdTypeRefOf() => AddAndReturn(new InstLdTypeRefOf());
+        public InstructionWriter LdSelf() => AddAndReturn(new InstLdSelf());
         public InstructionWriter LdMeta(OmegaMetadataKind kind) => AddAndReturn(new InstLdMeta(kind));
         
         public InstructionWriter StLocal(short index) => AddAndReturn(new InstStLocal(index));

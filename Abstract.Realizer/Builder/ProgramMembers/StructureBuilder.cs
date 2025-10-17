@@ -6,6 +6,8 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
 {
     public StructureBuilder? Extends = null;
     public List<InstanceFieldBuilder> Fields = [];
+    
+    public List<StaticFieldBuilder> StaticFields = [];
     public List<BaseFunctionBuilder> Functions = [];
     
     public uint? Length = null;
@@ -20,6 +22,12 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
     {
         var newField = new InstanceFieldBuilder(this, symbol, false);
         Fields.Add(newField);
+        return newField;
+    }
+    public StaticFieldBuilder AddStaticField(string symbol)
+    {
+        var newField = new StaticFieldBuilder(this, symbol, false);
+        StaticFields.Add(newField);
         return newField;
     }
     public FunctionBuilder AddFunction(string symbol)
@@ -63,6 +71,7 @@ public class StructureBuilder: TypeBuilder, INamespaceOrStructureBuilder
         if (Length != null || Alignment != null) sb.AppendLine();
         if (VTableSize != null) sb.AppendLine($"\t(vtablelength {VTableSize.Value})");
         
+        foreach (var i in StaticFields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in Fields) sb.AppendLine(i.ToString().TabAllLines());
         foreach (var i in Functions) sb.AppendLine(i.ToString().TabAllLines());
         sb.Length -= Environment.NewLine.Length;

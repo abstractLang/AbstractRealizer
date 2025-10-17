@@ -10,71 +10,52 @@ internal static class Unnester
     {
         Dictionary<ModuleBuilder, ModuleContent> moduleMembers = [];
         
-        ModuleBuilder[] modules = builder.Modules;
-        foreach (var module in modules)
+        foreach (var module in builder.Modules)
         {
             var mc = new ModuleContent();
-            SelectMembersRecursive(module, mc);
+            SelectMembersRecursive(module, module, mc);
             moduleMembers.Add(module, mc);
         }
 
         foreach (var (module, content) in moduleMembers)
         {
-            foreach (var member in content.fields)
-            {
-                var global = string.Join('.', member.Parent!.GlobalIdentifier);
-                member._symbol = global + '.' + member._symbol;
-                member.Parent = module;
-            }
             module.fields.Clear();
-            module.fields = content.fields;
-            
-            foreach (var member in content.functions)
-            {
-                var global = string.Join('.', member.Parent!.GlobalIdentifier);
-                member._symbol = global + '.' + member._symbol;
-                member.Parent = module;
-            }
             module.functions.Clear();
-            module.functions = content.functions;
-            
-            foreach (var member in content.structs)
-            {
-                var global = string.Join('.', member.Parent!.GlobalIdentifier);
-                member._symbol = global + '.' + member._symbol;
-                member.Parent = module;
-            }
             module.structures.Clear();
-            module.structures = content.structs;
-            
-            foreach (var member in content.typedefs)
-            {
-                var global = string.Join('.', member.Parent!.GlobalIdentifier);
-                member._symbol = global + '.' + member._symbol;
-                member.Parent = module;
-            }
             module.typedefs.Clear();
+            module.namespaces.Clear();
+            
+            module.fields = content.fields;
+            module.functions = content.functions;
+            module.structures = content.structs;
             module.typedefs = content.typedefs;
             
-            module.namespaces.Clear();
         }
     }
 
-    private static void SelectMembersRecursive(ProgramMemberBuilder member, ModuleContent content)
+    private static void SelectMembersRecursive(ProgramMemberBuilder member, ModuleBuilder module, ModuleContent content)
     {
         switch (member)
         {
             case NamespaceBuilder @nmsp:
-                foreach (var nmsps in nmsp.Namespaces) SelectMembersRecursive(nmsps, content);
-                foreach (var fields in nmsp.Fields) SelectMembersRecursive(fields, content);
-                foreach (var strucs in nmsp.Structures) SelectMembersRecursive(strucs, content);
-                foreach (var funcs in nmsp.Functions) SelectMembersRecursive(funcs, content);
-                foreach (var typedef in nmsp.TypeDefinitions) SelectMembersRecursive(typedef, content);
-                break;
-            
+            {
+                foreach (var nmsps in nmsp.Namespaces) SelectMembersRecursive(nmsps, module, content);
+                foreach (var fields in nmsp.Fields) SelectMembersRecursive(fields, module, content);
+                foreach (var strucs in nmsp.Structures) SelectMembersRecursive(strucs, module, content);
+                foreach (var funcs in nmsp.Functions) SelectMembersRecursive(funcs, module, content);
+                foreach (var typedef in nmsp.TypeDefinitions) SelectMembersRecursive(typedef, module, content);
+                nmsp.namespaces.Clear();
+                nmsp.fields.Clear();
+                nmsp.structures.Clear();
+                nmsp.functions.Clear();
+                nmsp.typedefs.Clear();
+            } break;
+
             case StructureBuilder @struc:
-                //foreach (var functions in struc.Functions) SelectMembersRecursive(functions, content);
                 content.structs.Add(struc);
+                
+                foreach (var sfields in struc.StaticFields) SelectMembersRecursive(sfields, module, content);
+                struc.StaticFields.Clear();
                 break;
             
             case TypeDefinitionBuilder @typedef:
@@ -87,6 +68,12 @@ internal static class Unnester
             
             default: throw new UnreachableException();
         }
+
+        if (member == module) return;
+        
+        var global = string.Join('.', member.Parent?.GlobalIdentifier ?? []);
+        member._symbol = global + '.' + member._symbol;
+        member.Parent = module;
     }
 
     private struct ModuleContent()

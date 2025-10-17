@@ -54,6 +54,10 @@ internal static class Unwrapper
                 instructions.Dequeue();
                 return new IrAssign(new IrField(stField.StaticField), UnwrapValue(instructions, newblocks));
             
+            case InstStStaticField stStaticField:
+                instructions.Dequeue();
+                return new IrAssign(new IrField(stStaticField.StaticField), UnwrapValue(instructions, newblocks));
+            
             case InstRet @r:
                 instructions.Dequeue();
                 return new IrRet(r.value ? UnwrapValue(instructions, newblocks) : null);
@@ -98,13 +102,15 @@ internal static class Unwrapper
             InstLdTypeRefOf @ldtyperefof => new IrTypeOf(UnwrapValue(instructions, newblocks)),
             
             InstLdField @ldField => new IrField(ldField.StaticField),
-            InstStField @stField => new IrField(stField.StaticField),
+            InstLdStaticField @ldStaticField => new IrField(ldStaticField.StaticField),
             
             InstLdConstI1 @ldc1 => new IrInteger(1, ldc1.Value ? 1 : 0),
             InstLdConstI @ldci => new IrInteger(ldci.Len, ldci.Value),
             InstLdConstIptr @ldcp => new IrInteger(null, ldcp.Value),
             
             InstLdStringUtf8 @str => new IrSliceBytes(Encoding.UTF8.GetBytes(str.Value)),
+            
+            InstLdSelf => new IrSelf(),
             
             InstCall @cal => new IrCall(cal.function, UnwrapValues(instructions, cal.function.Parameters.Count, newblocks)),
             
